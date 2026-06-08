@@ -1,48 +1,89 @@
 % =====================================================================
-%  Page de couverture
-%  ATTENTION : l'énoncé impose d'utiliser le MODÈLE officiel déposé sur
-%  Moodle (avec les logos de l'UM et de la FDS). Remplace cette page par
-%  ce modèle une fois récupéré. Ci-dessous une version provisoire.
+%  Page de couverture (page de garde)
+%  Reproduit la maquette « Page de garde » : sobre, académique,
+%  centrée et institutionnelle (logos UM / FdS / LIRMM, titre encadré
+%  de filets, accent corail de l'UM, bloc encadrement + année).
+%
+%  Logos attendus dans figures/ : logo-um.png, logo-fds.png, logo-lirmm.png
+%  Police EB Garamond restreinte à cette page (cf. préambule main.tex).
 % =====================================================================
+
+% ---- Petits utilitaires (locaux à la couverture) --------------------
+\newcommand{\sclabel}[1]{{\footnotesize\textls[180]{\textsc{#1}}}}
+\newcommand{\coralrule}{{\color{coral}\rule{38mm}{1.2pt}}}
+
 \begin{titlepage}
-\centering
 \thispagestyle{empty}
+\singlespacing              % composition serrée (≠ corps en interligne 1,5)
+\setlength{\parskip}{0pt}
+\ebgaramond                 % la garde est composée en EB Garamond
+\color{ink}
+\centering
 
-% --- Logos (à placer dans figures/ : logo-um.png, logo-fds.png) ------
-% \begin{minipage}{0.45\textwidth}\raggedright
-%   \includegraphics[height=2.2cm]{logo-um.png}
-% \end{minipage}\hfill
-% \begin{minipage}{0.45\textwidth}\raggedleft
-%   \includegraphics[height=2.2cm]{logo-fds.png}
-% \end{minipage}
+% Cadre fin façon « frame inset » (filet en filigrane, à 11 mm des bords)
+\begin{tikzpicture}[remember picture,overlay]
+  \draw[coverline,line width=0.4pt]
+    ([shift={(11mm,-11mm)}]current page.north west)
+    rectangle
+    ([shift={(-11mm,11mm)}]current page.south east);
+\end{tikzpicture}
 
-\vspace*{1.5cm}
-{\large Université de Montpellier \\ Faculté des Sciences\par}
-\vspace{0.4cm}
-{\large Master Informatique \par}
+% ===================== EN-TÊTE : LOGOS =====================
+\noindent
+\begin{minipage}[c]{0.30\linewidth}\centering
+  \includegraphics[height=24mm]{logo-um.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.36\linewidth}\centering
+  \includegraphics[height=15mm]{logo-fds.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.30\linewidth}\centering
+  \includegraphics[height=11mm]{logo-lirmm.png}
+\end{minipage}
 
-\vspace{2.5cm}
-{\Huge\bfseries Mémoire d'alternance\par}
-\vspace{0.8cm}
-{\LARGE Réduction de la dette technique \\[0.3em] et enjeux business associés\par}
-\vspace{0.6cm}
-{\large\itshape Du framework de test à la rétro-ingénierie :\\
-industrialiser la qualité logicielle dans deux contextes\par}
+\vspace{7mm}
+{\large\textls[160]{\MakeUppercase{Université de Montpellier}}}\\[1.5mm]
+{\color{muted}\textls[110]{\textsc{Faculté des Sciences — Master Informatique}}}
 
-\vspace{2.5cm}
-\begin{tabular}{rl}
-\textbf{Auteur} & : Jérémy Hurel \\[0.3em]
-\textbf{Entreprises} & : Free Mobile \,/\, Beemo Technologie \\[0.3em]
-\textbf{Période} & : \emph{[mois aaaa – mois aaaa]} \\[0.3em]
-\textbf{Encadrant entreprise} & : \emph{[Nom]} \\[0.3em]
-\textbf{Encadrant universitaire} & : \emph{[Nom]} \\
-\end{tabular}
+\vspace{5mm}
+\coralrule
+
+% ===================== BLOC CENTRAL =====================
+\vfill
+
+{\color{coraldeep}\textls[230]{\textsc{Mémoire de fin d'études}}}
+
+\vspace{3.5mm}
+{\large\textbf{Master 2 Informatique} — Parcours Génie Logiciel (GL)}
+
+\vspace{12mm}
+{\color{ink}\rule{\linewidth}{0.8pt}}\\[8mm]
+{\fontsize{27}{32}\selectfont Réduction de la dette technique\\[1mm]
+dans un environnement de production}\\[7mm]
+{\itshape\color{muted}\large Mémoire rédigé à l'issue de deux années d'alternance}\\[8mm]
+{\color{ink}\rule{\linewidth}{0.8pt}}
+
+\vspace{11mm}
+{\color{muted}\begin{minipage}{0.82\linewidth}\centering
+  Travaux réalisés dans le cadre d'un contrat d'apprentissage au sein de\\
+  {\color{ink}\textsc{Free Mobile}} et {\color{ink}\textsc{Beemo Technologie}}.
+\end{minipage}}
 
 \vfill
-{\large Année universitaire 2025--2026\par}
 
-% --- Décommenter si l'entreprise exige la confidentialité ------------
-% \vspace{0.5cm}
-% {\small\bfseries Document confidentiel — diffusion restreinte (durée : [N] ans).\par}
+% ===================== PIED : ENCADREMENT =====================
+{\color{coverline}\rule{\linewidth}{0.4pt}}\\[5mm]
+\noindent
+\begin{minipage}[t]{0.40\linewidth}\RaggedRight
+  {\color{coraldeep}\sclabel{Présenté par}}\\[2.8mm]
+  Jérémy Hurel
+\end{minipage}\hfill
+\begin{minipage}[t]{0.55\linewidth}\RaggedLeft
+  {\color{coraldeep}\sclabel{Encadrement}}\\[2.8mm]
+  David Desmarest~{\itshape\color{muted}\small— Architecte Logiciel, tuteur entreprise}\\[1mm]
+  Mickaël Montassier~{\itshape\color{muted}\small— tuteur universitaire}
+\end{minipage}
+
+\vspace{7mm}
+{\textls[260]{\MakeUppercase{Année universitaire 2024 -- 2026}}}
 
 \end{titlepage}

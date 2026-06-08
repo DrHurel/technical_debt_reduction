@@ -37,6 +37,19 @@
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
 
+% ---------- Page de couverture (maquette « Page de garde ») ----------
+\usepackage{letterspace}        % \textls[...]{} : interlettrage
+\usepackage{ragged2e}
+\usepackage{tikz}               % cadre fin en filigrane sur la couverture
+\usepackage{ebgaramond}         % serif académique — réservé à la couverture
+\renewcommand*\rmdefault{lmr}   % …le corps du mémoire reste en Latin Modern
+                                % (\ebgaramond bascule localement sur la garde)
+\definecolor{ink}{HTML}{1A1A1A}
+\definecolor{muted}{HTML}{5B5B5B}
+\definecolor{coverline}{HTML}{CFCFCF}
+\definecolor{coral}{HTML}{F0625F}
+\definecolor{coraldeep}{HTML}{D94E4B}
+
 % ---------- En-têtes / pieds de page ---------------------------------
 \usepackage{fancyhdr}
 \pagestyle{fancy}
