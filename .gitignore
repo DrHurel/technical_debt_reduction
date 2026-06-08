@@ -1,0 +1,31 @@
+# Sortie finale (régénérée par ./build.sh) — décommente si tu ne veux PAS la versionner
+# main.pdf
+
+# Fichiers temporaires LaTeX
+*.aux
+*.toc
+*.out
+*.log
+*.lof
+*.lot
+
+# Bibliographie
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+
+# Glossaire / acronymes
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.glsdefs
+*.ist
+
+# latexmk
+*.fls
+*.fdb_latexmk
+*.synctex.gz

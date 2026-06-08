@@ -1,0 +1,54 @@
+% =====================================================================
+%  Définitions du glossaire et des acronymes
+%  (référencés dans le texte avec \gls{clé} ou \acrshort{clé})
+% =====================================================================
+
+% ---------- Acronymes ------------------------------------------------
+\newacronym{ci}{CI}{Continuous Integration (intégration continue)}
+\newacronym{cd}{CD}{Continuous Delivery / Deployment}
+\newacronym{sdk}{SDK}{Software Development Kit}
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{abi}{ABI}{Application Binary Interface}
+\newacronym{ide}{IDE}{Integrated Development Environment}
+\newacronym{tdd}{TDD}{Test-Driven Development}
+\newacronym{poc}{PoC}{Proof of Concept}
+\newacronym{roi}{ROI}{Return On Investment (retour sur investissement)}
+\newacronym{qa}{QA}{Quality Assurance (assurance qualité)}
+\newacronym{vcs}{VCS}{Version Control System}
+\newacronym{e2e}{E2E}{End-to-End (test de bout en bout)}
+
+% ---------- Termes ---------------------------------------------------
+\newglossaryentry{dette-technique}{
+  name={dette technique},
+  description={Coût implicite des retouches futures induit par le choix
+  d'une solution rapide plutôt que d'une approche meilleure mais plus
+  longue à mettre en œuvre. Se rembourse par le refactoring ; génère des
+  « intérêts » sous forme de ralentissement du développement}
+}
+\newglossaryentry{test-regression}{
+  name={test de non-régression},
+  description={Test vérifiant qu'une modification du code n'a pas
+  réintroduit de défaut ni cassé une fonctionnalité existante}
+}
+\newglossaryentry{test-integration}{
+  name={test d'intégration},
+  description={Test validant le bon fonctionnement conjoint de plusieurs
+  composants assemblés, par opposition au test unitaire}
+}
+\newglossaryentry{fork}{
+  name={fork},
+  description={Divergence d'une base de code en plusieurs variantes
+  maintenues en parallèle, partageant une origine commune}
+}
+\newglossaryentry{retro-ingenierie}{
+  name={rétro-ingénierie},
+  description={Analyse d'un système ou binaire existant pour en
+  comprendre la structure et le comportement, en l'absence de
+  documentation ou de sources complètes}
+}
+\newglossaryentry{toolchain}{
+  name={chaîne de compilation (toolchain)},
+  description={Ensemble des outils (compilateur, éditeur de liens,
+  bibliothèques) permettant de transformer le code source en binaire
+  exécutable pour une cible donnée}
+}
