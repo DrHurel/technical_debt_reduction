@@ -1,0 +1,74 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "fontSize": "15px",
+    "lineColor": "#5B5B5B",
+    "primaryColor": "#FFFFFF",
+    "primaryBorderColor": "#5B5B5B",
+    "clusterBorderColor": "#B0B0B0"
+  },
+  "flowchart": { "curve": "basis", "nodeSpacing": 55, "rankSpacing": 60 }
+}}%%
+flowchart TB
+    YAML[/"Scénario de test (YAML)"/]
+
+    subgraph FW["&nbsp;Framework de test&nbsp;"]
+        direction TB
+        SAX["<b>Parseur SAX</b><br/>récupère les lignes d'instruction,<br/>localise les erreurs de syntaxe"]
+        DBG["<b>Débogueur</b><br/>exécution pas à pas"]
+        LOOP{{"<b>Boucle d'exécution séquentielle</b><br/>(for, sans retour arrière)"}}
+        FACT["<b>Factory d'instructions</b><br/>(pattern Command)"]
+        REG[("<b>Command Registry</b><br/>commandes enregistrées")]
+        ERR>"<b>Interruption sur erreur</b><br/>• ligne fautive<br/>• arguments mal formés<br/>• instruction non supportée"]
+
+        subgraph SVC["&nbsp;Services de mock &amp; vérification&nbsp;"]
+            direction TB
+            EQ["<b>Mock équipements</b><br/>autorisation appel / SMS,<br/>crédit selon localisation"]
+            NOTIF["<b>Service de notifications</b><br/>mails / messages de seuil"]
+            CHK["<b>Vérification des données</b><br/>cohérence base ⟷ trame d'appel"]
+        end
+    end
+
+    SUT["<b>Valo Engine</b><br/>(logiciel testé — SUT)"]
+    DB[("<b>Base de données</b>")]
+
+    YAML --> SAX
+    SAX -- "lignes" --> DBG
+    SAX -- "erreur de syntaxe" --> ERR
+    SAX --> LOOP
+    DBG -. "pas à pas" .-> LOOP
+    REG --> FACT
+    LOOP -- "texte → instruction" --> FACT
+    FACT -- "instruction" --> LOOP
+
+    LOOP --> EQ
+    LOOP --> NOTIF
+    LOOP --> CHK
+
+    EQ -- "requêtes équipements" --> SUT
+    SUT -- "notifications de seuil" --> NOTIF
+    SUT -- "données générées" --> DB
+    CHK -- "lecture & contrôle" --> DB
+
+    %% ---- Palette ----
+    classDef input   fill:#FFF3CD,stroke:#E0A800,stroke-width:1.5px,color:#5A4400;
+    classDef parse   fill:#D7E9FF,stroke:#2F6FB8,stroke-width:1.5px,color:#143A66;
+    classDef core    fill:#E6DCFB,stroke:#7A52CC,stroke-width:1.5px,color:#3A2173;
+    classDef error   fill:#FBD7D7,stroke:#D94E4B,stroke-width:1.5px,color:#7A1F1D;
+    classDef service fill:#D8F5E3,stroke:#2E9E5B,stroke-width:1.5px,color:#1A5C34;
+    classDef sut     fill:#F0625F,stroke:#A82E2B,stroke-width:2px,color:#FFFFFF;
+    classDef store   fill:#E8E8E8,stroke:#5B5B5B,stroke-width:1.5px,color:#1A1A1A;
+
+    class YAML input;
+    class SAX,DBG parse;
+    class LOOP,FACT,REG core;
+    class ERR error;
+    class EQ,NOTIF,CHK service;
+    class SUT sut;
+    class DB store;
+
+    style FW  fill:#FAFAFA,stroke:#9AA0A6,stroke-width:1.5px,color:#1A1A1A;
+    style SVC fill:#F1FBF5,stroke:#2E9E5B,stroke-width:1.2px,stroke-dasharray:4 3,color:#1A5C34;
+
+    linkStyle default stroke:#7A7A7A,stroke-width:1.4px;

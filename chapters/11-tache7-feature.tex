@@ -1,0 +1,172 @@
+\chapter{Tâche 7 — Développement d'une fonctionnalité en code de production}
+\label{chap:t7}
+% Entreprise : Beemo Technologie
+
+\section{Contexte et besoin}
+% TODO : présenter la feature demandée, le besoin métier/utilisateur, et
+% son insertion dans la base de code existante (legacy ? bien outillée ?).
+Le métier de Beemo n'est pas de proposer un \textbf{service de cloud} à la
+manière des grands fournisseurs — Amazon, Google ou Microsoft. Il s'agit de
+fournir aux \textbf{professionnels} — hébergeurs et entreprises pour qui la
+donnée constitue un actif critique — un moyen de \textbf{sécuriser leurs
+données} et de garantir leur \textbf{restauration} en cas d'incident, qu'il soit
+d'origine \textbf{physique} ou \textbf{malveillante}. Le produit central, la
+\textbf{BBox}, est une appliance de \textbf{sauvegarde} qui peut être
+\textbf{externalisée} hors site afin de survivre à la destruction du système
+d'origine.
+
+L'un des scénarios de perte de données les plus redoutés est le
+\textbf{ransomware}, qui chiffre les données d'un système pour en exiger une
+rançon. La BBox répond directement à cette menace en conservant des
+\textbf{jeux de sauvegarde} hors d'atteinte du système compromis. Mais une
+question demeure : \textbf{que se passe-t-il si la BBox elle-même est
+compromise} ? Un attaquant parvenu jusqu'à l'appliance pourrait alors tenter
+d'\textbf{altérer les jeux de sauvegarde} ou de \textbf{saboter leur
+restauration} — anéantissant la dernière ligne de défense du client.
+
+C'est pour répondre à ce scénario que Beemo développe une nouvelle
+fonctionnalité, l'\textbf{immuabilité}. Son principe : rendre un jeu de
+sauvegarde \textbf{insupprimable} et \textbf{inaltérable} tant qu'un
+\textbf{délai de rétention} n'est pas écoulé, y compris pour un utilisateur
+disposant de droits sur la box — et donc pour un attaquant qui en aurait pris le
+contrôle. J'ai participé à son développement aux côtés de \textbf{deux autres
+développeurs}, en me concentrant sur la partie \textbf{embarquée sur la box},
+écrite en \textbf{C++}.
+
+\section{Objectif de la mission}
+% TODO : implémenter la fonctionnalité en code de production, en limitant
+% l'ajout de dette technique (qualité, tests, intégration propre).
+L'objectif n'était pas seulement de \textbf{livrer la fonctionnalité}, mais de
+le faire dans un contexte particulièrement défavorable : celui d'une base de
+code embarquée portant une \textbf{dette technique considérable}. L'intérêt de
+cette tâche, au regard du fil rouge de ce mémoire, tient précisément là —
+\textbf{comment injecter une fonctionnalité moderne dans du code dégradé sans
+en briser l'existant} ?
+
+Le firmware de la box cumule en effet la plupart des symptômes de la dette :
+\begin{itemize}
+  \item un \textbf{abus de directives de préprocesseur} (\texttt{\#ifdef},
+        \texttt{\#ifndef}) pour gérer les multiples cas de \textbf{compilation}
+        de la box, rendant le code difficile à lire et à raisonner ;
+  \item des \textbf{fonctions extrêmement longues} et une \textbf{maîtrise
+        approximative du C++}, donnant lieu à des constructions trompeuses —
+        par exemple des contrôles du type \texttt{this == nullptr}, un cas qui
+        \textbf{ne peut jamais se produire} et trahit une incompréhension du
+        langage ;
+  \item une \textbf{absence totale de tests} — ni \gls{test-regression}, ni
+        tests unitaires — qui prive de tout filet de sécurité lors d'une
+        modification ;
+  \item un fichier \texttt{main.h} qui \textbf{inclut l'ensemble des fichiers}
+        du projet, créant un \textbf{couplage massif} : réutiliser une
+        fonctionnalité existante depuis du code neuf devient une opération
+        complexe et risquée.
+\end{itemize}
+La contrainte centrale était donc de \textbf{ne pas aggraver cette dette} : il
+fallait écrire du code \textbf{moderne, testable et isolé}, tout en
+\textbf{dialoguant} avec un existant qui ne s'y prête pas.
+
+\section{Conception et intégration}
+% TODO : choix de conception, impact sur l'architecture existante,
+% interaction avec le travail des tâches précédentes (tests, build).
+La réponse à cette tension repose sur une \textbf{couche intermédiaire}
+d'\textbf{adaptation}, conçue par David, l'un des développeurs de l'équipe.
+L'idée est d'\textbf{encapsuler} une fonctionnalité — qu'elle soit
+\textbf{legacy} ou \textbf{nouvelle} — derrière une \textbf{classe} pouvant être
+appelée \textbf{indifféremment depuis l'ancien code ou depuis le code neuf}. Les
+appels vers l'existant sont \textbf{masqués} par des \textbf{pointeurs} transmis
+à cette classe, ce qui \textbf{découple} le nouveau code du couplage imposé par
+\texttt{main.h}.
+
+Ce mécanisme d'\emph{enrobage} (\emph{wrapping}) joue le rôle de
+\textbf{frontière} : d'un côté, le firmware historique et ses contraintes ; de
+l'autre, un espace où l'on peut écrire du \textbf{C++ réellement moderne} pour
+réaliser la fonctionnalité. La fonctionnalité d'immuabilité a ainsi pu être
+bâtie autour de deux briques propres :
+\begin{itemize}
+  \item un \textbf{automate à états} (\emph{state machine}) qui pilote le cycle
+        de vie d'un jeu de sauvegarde immuable — création, période de rétention,
+        mise en pause du \textbf{planificateur de sauvegarde}, expiration ;
+  \item un \textbf{service de chiffrement} qui garantit l'\textbf{intégrité} des
+        données. La base est \textbf{lue et déchiffrée à l'aide d'une clé} : si
+        elle a été \textbf{altérée}, le déchiffrement échoue, \textbf{le code le
+        détecte} et la box se \textbf{bloque} — empêchant toute manipulation des
+        jeux de données réels par un attaquant parvenu jusqu'à l'appliance.
+\end{itemize}
+L'immuabilité vient ainsi s'ajouter aux mécanismes de sécurisation existants :
+elle \textbf{empêche la suppression} d'un jeu de sauvegarde considéré comme
+immuable tant que le \textbf{délai de rétention} n'a pas été respecté.
+
+\section{Réalisation}
+% TODO : extrait de code de production commenté + éventuels tests associés.
+La couche d'adaptation est le point d'entrée de toute la fonctionnalité.
+L'extrait ci-dessous en illustre le principe : une classe moderne expose le
+service d'immuabilité au reste du système, tout en dissimulant les appels au
+firmware historique derrière un pointeur opaque transmis à la construction.
+
+\begin{lstlisting}[language=C++,caption={Couche d'adaptation isolant le code neuf du firmware legacy : les appels à l'existant sont masques derriere un pointeur (extrait illustratif).},label={lst:t5}]
+// La fonctionnalite d'immuabilite est ecrite en C++ moderne, isolee du
+// firmware historique. Le couplage impose par main.h est neutralise :
+// le code neuf ne connait l'existant qu'a travers un pointeur opaque.
+class ImmutabilityService {
+public:
+    // Le legacy est injecte par pointeur a la construction : le code neuf
+    // n'inclut jamais main.h et reste testable de maniere isolee.
+    explicit ImmutabilityService(LegacyBackupContext* ctx) noexcept
+        : m_ctx(ctx) {}
+
+    // Verrouille un jeu de sauvegarde : il devient insupprimable et
+    // inalterable tant que le delai de retention n'est pas ecoule.
+    Result lock(const BackupSetId& id, RetentionDelay delay) {
+        // L'automate a etats pilote le cycle de vie de l'immuabilite.
+        if (!m_state.canTransitionTo(State::Locked))
+            return Result::Rejected;
+
+        // L'integrite est garantie par chiffrement : a la relecture, un
+        // echec de dechiffrement revele toute alteration de la base.
+        auto sealed = m_cipher.seal(id, delay);
+        m_state.transition(State::Locked);
+        return sealed ? Result::Ok : Result::IntegrityError;
+    }
+
+private:
+    LegacyBackupContext* m_ctx;   // pointeur opaque vers le firmware legacy
+    ImmutabilityStateMachine m_state;
+    CipherService m_cipher;
+};
+\end{lstlisting}
+
+\section{Difficultés rencontrées}
+% TODO : contraintes du code existant, revues, exigences de qualité.
+La principale difficulté n'a pas été la \textbf{conception de la fonctionnalité}
+en elle-même, mais sa \textbf{cohabitation avec l'existant}. Comprendre le
+firmware historique — afin de \textbf{réutiliser ses fonctionnalités} depuis le
+code neuf — s'est avéré coûteux, en raison du \textbf{couplage par
+\texttt{main.h}}, des \textbf{fonctions interminables} et des \textbf{cas de
+compilation} multipliés par les directives de préprocesseur.
+
+L'\textbf{absence de tests} a constitué un risque permanent : sans
+\gls{test-regression}, la moindre modification dans une zone partagée pouvait
+\textbf{casser silencieusement} une fonctionnalité existante. La couche
+d'adaptation a ici joué un rôle de \textbf{garde-fou}, en \textbf{circonscrivant}
+les points de contact avec le legacy et en rendant le code neuf
+\textbf{testable de manière isolée} — là où le reste du firmware ne l'est pas.
+
+\section{Résultats et bénéfice business}
+% TODO : valeur livrée, qualité maintenue (pas de dette ajoutée),
+% éventuelle couverture de tests. Relier au fil rouge.
+Cette tâche illustre une facette essentielle de la lutte contre la dette
+technique : il ne s'agit pas toujours de \textbf{résorber} l'existant, mais
+parfois de savoir \textbf{construire proprement à côté} sans l'aggraver. Grâce à
+la couche d'adaptation, la fonctionnalité d'immuabilité a pu être développée en
+\textbf{C++ moderne}, \textbf{isolée} et \textbf{testable}, alors même qu'elle
+s'insère dans un firmware fortement dégradé et dépourvu de filet de sécurité.
+
+Sur le plan \textbf{business}, l'immuabilité renforce directement la
+\textbf{proposition de valeur} de Beemo : elle protège les jeux de sauvegarde
+non seulement contre la compromission du système client, mais aussi contre la
+\textbf{compromission de la BBox elle-même}. En garantissant qu'un jeu de
+sauvegarde immuable ne peut être ni supprimé ni altéré avant l'expiration de son
+\textbf{délai de rétention}, et en \textbf{bloquant} la box au moindre signe
+d'altération détecté par le chiffrement, la fonctionnalité ferme l'un des
+derniers angles d'attaque possibles — consolidant la promesse fondamentale du
+produit : \textbf{la donnée sauvegardée n'est jamais perdue}.

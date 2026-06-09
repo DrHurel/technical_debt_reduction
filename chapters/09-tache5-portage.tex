@@ -1,0 +1,134 @@
+\chapter{Tâche 5 — Portage du framework vers les forks legacy du Valo Engine}
+\label{chap:t5}
+% Entreprise : Free Mobile
+
+\section{Contexte et dette technique initiale}
+% TODO : pourquoi plusieurs \gls{fork} du programme initial existent-ils ?
+% Quelle dette cela crée-t-il (duplication de tests, divergence, double
+% maintenance) ? C'est le « problème business » à résoudre.
+Le framework de test (tâche~3, chapitre~\ref{chap:t3}) avait été conçu pour le
+\emph{Valo Engine} du \textbf{réseau prépayé} de Free Mobile, un réseau alors
+nouveau. Une fois ce dernier mis en production et jugé \textbf{stable}, la
+stratégie de gestion de la dette technique a été révisée — une inflexion qui a
+coïncidé avec le départ de David.
+
+La stratégie initiale faisait du prépayé le socle d'une \textbf{base de code
+commune et moderne}, destinée à être réutilisée par les moteurs de valorisation
+des différents réseaux : on aurait ainsi migré progressivement chaque réseau
+vers cette version moderne. Elle a cédé la place à une approche de \textbf{quick
+fix} — que l'on pourrait presque qualifier de \emph{quick converting} —, visant
+à \textbf{stabiliser au maximum} les réseaux existants sans en moderniser le
+code ; la modernisation n'interviendrait, le cas échéant, qu'une fois cette
+stabilisation acquise.
+
+Or ces réseaux reposent sur autant de \gls{fork} \emph{legacy} du moteur, chacun
+doté de ses spécificités métier. Plusieurs inconnues pesaient sur les
+exécutables réellement en production : certains binaires n'avaient pas été mis à
+jour depuis longtemps, et les sources se répartissaient entre le dépôt GitLab et
+diverses machines. Toucher à ce code sans filet était d'autant plus risqué que
+le \emph{Valo Engine} calcule le \textbf{coût de chaque appel} : une régression
+ou une panne sur ce maillon peut engendrer des pertes \textbf{de l'ordre du
+million d'euros en une semaine}. La dette tenait donc à l'absence de tout moyen
+de garantir qu'un correctif n'introduise pas, par inadvertance, un
+\textbf{changement de logique métier} sur l'un de ces forks.
+
+\section{Objectif de la mission}
+% TODO : faire évoluer le framework (tâche 3) pour qu'il supporte
+% plusieurs forks avec un socle de tests mutualisé.
+La mission a consisté à \textbf{porter le framework de test} vers l'ensemble des
+forks legacy du \emph{Valo Engine}, afin de doter chaque réseau d'un filet de
+non-régression \emph{avant} d'y appliquer le moindre correctif. Le périmètre
+couvrait six variantes : la France \textbf{B2C} et \textbf{B2B}, les
+\textbf{Caraïbes}, l'Italie \textbf{B2C} et \textbf{B2B}, ainsi que le
+\textbf{proxy} italien.
+
+L'objectif premier n'était pas de couvrir fonctionnellement chaque réseau dans
+les moindres détails, mais de disposer d'un \textbf{contrôle sur le code métier}
+de chaque fork : pouvoir y appliquer des correctifs avec l'assurance que la
+logique de valorisation demeurait inchangée.
+
+\section{Conception : factorisation et paramétrage}
+% TODO : stratégie de portage (abstraction des différences entre forks,
+% configuration par fork, tests communs vs spécifiques). Schéma avant/après.
+La principale difficulté de conception tenait à l'hétérogénéité des réseaux,
+qui se répartissent en deux modèles de facturation. Les réseaux en
+\gls{online-charging} fonctionnent comme le prépayé : les trames d'appel, de
+SMS et de data sont échangées en temps réel via un protocole TCP interne. Les
+réseaux en \gls{offline-charging}, eux, ne dialoguent pas en direct avec le
+moteur : celui-ci \textbf{consomme des \gls{cdr}}, c'est-à-dire des fichiers
+décrivant a posteriori la consommation. Un premier chantier a donc consisté à
+doter le framework de la capacité à \textbf{produire et lire des CDR} pour
+simuler les équipements en \emph{offline charging}, là où il ne savait jusque-là
+qu'émettre des trames TCP.
+
+Pour absorber cette diversité, David avait amorcé une refonte du framework
+articulée autour de deux notions complémentaires :
+\begin{itemize}
+  \item un \textbf{core} — le socle commun à toutes les versions supportées. Il
+        porte la mécanique invariante : la boucle d'exécution et le
+        \emph{parsing} des instructions du langage de test ;
+  \item des \textbf{specs} — une par fork — qui spécifient \emph{quelles}
+        instructions sont disponibles et \emph{comment} elles s'exécutent, en
+        fournissant leur \textbf{implémentation runtime} propre au réseau visé.
+\end{itemize}
+Cette séparation \emph{core} / \emph{spec} permet de mutualiser tout ce qui ne
+dépend pas du réseau et de n'isoler, fork par fork, que les différences de
+comportement métier — préparant du même coup la modernisation ultérieure.
+
+\section{Réalisation}
+% TODO : extrait montrant le mécanisme de paramétrisation par fork.
+Le portage s'est déroulé en \textbf{binôme}. Ayant déposé ma démission, je
+m'inscrivais dans une démarche de \textbf{transmission de connaissances} avec
+Jérémy, recruté en renfort de l'équipe. Travailler à deux lui a permis de
+s'approprier un framework devenu conséquent — de l'ordre de 30~000 lignes, près
+de 40~000 en comptant le code généré pour la communication TCP — tout en menant
+le portage à bien.
+
+Concrètement, chaque fork a été décrit par sa \emph{spec}, qui enregistre auprès
+du \emph{core} l'implémentation des instructions propres au réseau ; le
+\emph{core} reste, lui, identique d'un fork à l'autre.
+
+\begin{lstlisting}[language=Python,caption={Paramétrage d'un fork : une \emph{spec} enregistre ses instructions auprès du \emph{core} (extrait illustratif).},label={lst:t5}]
+# Le core fournit la boucle d'exécution et le parsing, communs à tous les forks.
+# Chaque spec n'apporte que ce qui diffère : l'implémentation runtime des
+# instructions et le mode de communication avec l'engine (TCP ou CDR).
+class SpecItalieB2C(Spec):
+    charging = OfflineCharging()      # consommation de CDR (fichiers)
+
+    @instruction("appel_voix")
+    def appel_voix(self, ctx, args):
+        cdr = self.charging.encoder_cdr(args)   # encodage au format du fork
+        ctx.engine.consommer(cdr)               # alimente le Valo Engine legacy
+\end{lstlisting}
+
+\section{Difficultés rencontrées}
+% TODO : divergences de comportement entre forks, rétro-compatibilité.
+Deux obstacles ont dominé la réalisation. Le premier a été le \textbf{décodage du
+format binaire des CDR}. Ces enregistrements sont certes normalisés en amont par
+une brique dédiée, le \emph{CDR hub} ; il restait néanmoins à \textbf{décoder leur
+contenu} : la disposition exacte des données, la valeur de chaque champ et, plus
+encore, ce que ces champs représentent d'un point de vue fonctionnel.
+
+Le second a tenu au \textbf{pilotage des engines legacy}. Contrairement au moteur
+du prépayé, beaucoup plus moderne et doté d'un service de testing exposant une
+\textbf{API HTTP}, les forks legacy n'avaient \textbf{jamais été pensés pour
+accueillir des tests}. Il a donc fallu trouver le moyen de les \textbf{démarrer},
+de les \textbf{arrêter} et de \textbf{dialoguer} avec eux, sans le point d'entrée
+dédié dont bénéficiait le prépayé.
+
+\section{Résultats et bénéfice business}
+% TODO : maintenance unifiée, non-régression sur tous les forks d'un coup,
+% réduction de la duplication. Relier au thème dette technique.
+Le portage a étendu le filet de non-régression aux forks legacy du \emph{Valo
+Engine} : les correctifs de stabilisation pouvaient désormais être appliqués
+avec l'assurance qu'aucun \textbf{changement de logique métier} ne s'y glissait à
+l'insu de l'équipe. Sur un composant dont une défaillance se chiffre en millions
+d'euros par semaine, ce contrôle constitue avant tout une \textbf{maîtrise du
+risque financier}.
+
+Au-delà du gain immédiat, l'architecture \emph{core} / \emph{spec} factorise la
+mécanique commune et n'isole que les spécificités de chaque réseau : elle réduit
+la duplication entre forks et \textbf{prépare la modernisation} envisagée à plus
+long terme (chapitre~\ref{chap:veille}).
+% TODO : quantifier si possible — nombre de forks effectivement couverts,
+% régressions évitées lors des fixes de stabilisation.

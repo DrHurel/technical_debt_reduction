@@ -8,13 +8,55 @@
 % =====================================================================
 
 \section{Langages et bibliothèques}
-% TODO : langages utilisés (ex. Python/C/C++/Shell...), frameworks de test
-% (ex. pytest, ...), bibliothèques clés. Une phrase de justification par item.
-\emph{[À rédiger.]}
+Les environnements techniques de Free Mobile et de Beemo se sont révélés
+suffisamment proches pour que cette similarité ait précisément motivé ma
+candidature : c'est ce type d'environnement qui m'intéressait. Dans les deux
+entreprises, le logiciel principal est écrit en C++, et gravite autour de lui
+un ensemble d'outils externes développés dans différents langages. Pour tout
+ce qui relève du \emph{scripting}, Python est très largement utilisé, le plus
+souvent appelé depuis des scripts \emph{batch} ; on trouve par ailleurs des
+\gls{api} écrites dans des langages moins orientés haute performance que le
+C++.
+
+Le choix du C++ comme langage principal tient d'abord à l'attrait du langage
+lui-même : il a beaucoup évolué et propose aujourd'hui une bibliothèque
+standard et des fonctionnalités permettant d'écrire un code conforme aux
+recommandations issues des dernières avancées du génie logiciel. Étant
+compilé, il offre en outre des performances élevées. Chez Free Mobile, où un
+gros volume de données devait être traité, ce point était impératif ; chez
+Beemo, où les \emph{box} ont vocation à sauvegarder plusieurs téraoctets de
+données, de bonnes performances restent nécessaires pour garantir une
+expérience utilisateur correcte.
+
+Le choix de Python répond, lui, à une logique de facilité et de portabilité.
+L'absence d'étape de compilation est une force : elle dispense d'une chaîne
+de \gls{ci}/\gls{cd} complexe pour produire les nombreux outils internes
+utiles au quotidien, et permet ainsi de gagner en productivité. La même
+logique vaut pour les autres langages employés sur les logiciels que l'on
+pourrait qualifier de plus proches du \emph{front} : on n'y recherche pas tant
+des performances élevées qu'un livrable facilement déployable et pouvant être
+mis à jour sans difficulté majeure.
+
+\section{Stockage et transport de données}
+Chez Free Mobile, un effort de standardisation des outils de stockage et de
+transfert de données a été mené. On y retrouve ainsi une base de données
+MySQL pour les usages historiques liés aux utilisateurs, ainsi qu'Apache
+Kafka pour produire des flux de données et remonter des informations vers
+d'autres équipes. Le monitoring s'appuie sur Prometheus, qui permet de
+collecter des métriques directement sur les différents logiciels en
+exploitation.
+
+Le stockage des \gls{cdr} — les données générées par les équipements
+téléphoniques, terme standard du domaine des télécoms — repose sur une base
+NoSQL, Cassandra. Cette dernière présentant toutefois certaines limitations,
+ClickHouse a été introduit en complément : il s'agit d'une base de données
+relationnelle orientée colonne, qui offre d'excellentes performances sur les
+requêtes d'agrégation et se prête donc particulièrement bien au calcul de
+statistiques sur de gros volumes de données.
 
 \section{Outils de build et de compilation}
 % TODO : chaîne de compilation, SDK, gestionnaires de dépendances,
-% (utile en amont de la tâche 3 « rétro-ingénierie »).
+% (utile en amont de la tâche 4 « rétro-ingénierie »).
 \emph{[À rédiger.]}
 
 \section{Gestion de version et intégration continue}
@@ -22,5 +64,40 @@
 \emph{[À rédiger.]}
 
 \section{Méthodologie et gestion de projet}
-% TODO : méthode (agile/scrum/kanban ?), outils de ticketing, rituels.
-\emph{[À rédiger.]}
+Chez Free Mobile, l'organisation du travail suit une méthode \emph{agile},
+structurée en \emph{sprints} et rythmée par des points quotidiens
+(\emph{daily meetings}). La durée des sprints était ajustée à la nature des
+logiciels maintenus par l'équipe : la partie cœur, écrite en C++, ainsi que
+les outils liés au traitement des \gls{cdr} étaient développés sur des sprints
+de trois semaines, tandis que la partie \gls{api} et interface web, dont les
+besoins différaient, suivait des cycles plus courts de deux semaines.
+
+Le rituel central était le point quotidien d'une quinzaine de minutes, tenu en
+début de journée — autour de huit heures quarante-cinq, selon les heures
+d'arrivée de chacun — avant le début effectif de la journée de travail. Ce
+rendez-vous court permettait à chaque membre de l'équipe de partager son
+avancement et d'identifier rapidement les éventuels points de blocage.
+
+Mon positionnement dans cette organisation était particulier : mes
+développements n'étaient pas intégrés aux sprints. Je travaillais en effet sur
+des outils annexes dont la production ne dépendait pas directement, même s'ils
+aidaient les développeurs à produire un code plus sûr et à gagner en confiance
+lors des \emph{releases}. Ce statut « hors sprint » m'a offert un réel confort
+de développement, en me dégageant de la pression liée aux échéances de
+livraison.
+
+Chez Beemo Technologie, l'organisation repose également sur une méthode
+\emph{agile}, mais déclinée de façon plus complète : on y retrouve l'ensemble
+des étapes du processus. Le point quotidien s'y tient à onze heures
+quarante-cinq, et s'y ajoute une phase de raffinement (\emph{refinement})
+au cours de laquelle les tickets sont précisés avant le démarrage de leur
+développement — une pratique qui n'était pas spécifiquement mise en œuvre chez
+Free Mobile, où l'on se montrait plus flexible sur ce point. Chaque fin de
+sprint, d'une durée de deux à trois semaines, donne par ailleurs lieu à une
+rétrospective.
+
+Au-delà de ces nuances, il n'existe pas de différence majeure entre les deux
+équipes : la méthode agile correspond bien aux besoins du développement dans
+les deux contextes. En revanche, mon rôle y était sensiblement différent de
+celui que j'occupais chez Free Mobile. Mes développements ayant vocation à
+être livrés en production, j'étais cette fois pleinement intégré aux sprints.

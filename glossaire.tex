@@ -16,6 +16,10 @@
 \newacronym{qa}{QA}{Quality Assurance (assurance qualité)}
 \newacronym{vcs}{VCS}{Version Control System}
 \newacronym{e2e}{E2E}{End-to-End (test de bout en bout)}
+\newacronym{lsp}{LSP}{Language Server Protocol}
+\newacronym{dap}{DAP}{Debug Adapter Protocol}
+\newacronym{cdr}{CDR}{Call Detail Record (enregistrement détaillé d'appel)}
+\newacronym{tui}{TUI}{Text User Interface (interface en mode texte)}
 
 % ---------- Termes ---------------------------------------------------
 \newglossaryentry{dette-technique}{
@@ -34,6 +38,18 @@
   name={test d'intégration},
   description={Test validant le bon fonctionnement conjoint de plusieurs
   composants assemblés, par opposition au test unitaire}
+}
+\newglossaryentry{online-charging}{
+  name={online charging},
+  description={Modèle de facturation en temps réel : les équipements
+  interrogent le moteur de valorisation pendant l'appel (ou l'envoi de
+  SMS/data) via un protocole d'échange direct, ici un protocole TCP interne}
+}
+\newglossaryentry{offline-charging}{
+  name={offline charging},
+  description={Modèle de facturation a posteriori : la consommation est
+  décrite dans des fichiers (\acrshort{cdr}) que le moteur de valorisation
+  consomme après coup, sans dialogue en temps réel avec les équipements}
 }
 \newglossaryentry{fork}{
   name={fork},

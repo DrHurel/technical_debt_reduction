@@ -4,7 +4,7 @@
 % =====================================================================
 %  Ce chapitre + « Travaux effectués » doivent représenter AU MOINS la
 %  moitié du mémoire. C'est ici qu'on pose le cadre conceptuel qui sert
-%  de grille de lecture aux 4 tâches. Mobiliser la bibliographie
+%  de grille de lecture aux 7 tâches. Mobiliser la bibliographie
 %  (references.bib) : Cunningham, Fowler, Feathers, Kruchten, Humble.
 % =====================================================================
 
@@ -21,12 +21,92 @@
 \emph{[À rédiger.]}
 
 \section{Enjeux business}
-% TODO : le cœur du thème. Traduire la dette en termes d'entreprise :
-% - vélocité de livraison et time-to-market
-% - coût de maintenance et risque de régression
-% - fiabilité / image (surtout pour un opérateur télécom)
-% - \gls{roi} d'un investissement dans les tests / l'outillage
-\emph{[À rédiger.]}
+% Cœur du thème. La tension centrale : confort du développeur (tout geler)
+% vs nécessité de rester compétitif sur un marché volatil, quelle que soit
+% la taille de l'entreprise.
+
+Traduire la dette technique en termes d'entreprise revient d'abord à reconnaître
+une tension difficilement contournable. Du strict point de vue du développeur, le
+confort absolu dans le traitement de la dette consisterait à suspendre tout
+développement de nouvelle fonctionnalité \emph{business} pour se consacrer
+pleinement à l'assainissement du code existant. Cette option est pourtant
+illusoire : il est impossible d'ignorer la nécessité de continuer à livrer de
+nouvelles fonctionnalités, ne serait-ce que pour rester compétitif. Le marché du
+numérique est en effet particulièrement volatil et changeant, et cette contrainte
+s'impose quelle que soit la taille de l'entreprise. Un gel complet des
+développements serait, au mieux, financièrement encaissable par les plus grandes
+structures, au prix d'un impact non négligeable sur leur croissance ; il serait
+tout simplement rédhibitoire pour celles qui sont incapables de mener de front
+maintenance du legacy et nouveaux développements.
+
+La dette technique se pose donc rarement comme un problème purement technique :
+elle relève d'un arbitrage permanent entre le temps consacré à la production de
+valeur immédiate — le \emph{time-to-market} des fonctionnalités attendues par le
+marché — et celui investi dans la soutenabilité du logiciel à long terme : coût
+de maintenance, risque de régression et fiabilité, cette dernière pesant tout
+particulièrement pour un opérateur télécom. Toute la difficulté consiste à
+résorber la dette \emph{sans} renoncer à cette capacité de livraison continue.
+C'est précisément cet équilibre que les deux entreprises ont eu à construire, de
+manière empirique, comme le détaille le retour d'expérience qui suit.
+
+\section{Retour d'expérience : stratégies d'adressage et dimension sociale}
+% Section nourrie par l'observation directe des deux contextes (Free Mobile,
+% Beemo). Elle illustre concrètement les enjeux business énoncés plus haut et
+% introduit l'enjeu humain, souvent passé sous silence.
+
+Au-delà des leviers strictement techniques, les deux entreprises où j'ai
+exercé montrent que la manière d'adresser la dette dépend autant de l'état de
+la base de code que de contraintes économiques — et humaines. Cette section
+revient sur ce que j'ai pu observer dans chacun de ces contextes.
+
+\subsection{Une même logique d'adressage incrémental}
+Face à la tension décrite plus haut, les deux entreprises ont adopté une même
+réponse : un adressage incrémental de la dette. Plutôt que de geler les
+développements, il s'agit de partir du code existant et, lorsqu'une
+fonctionnalité doit être ajoutée à un endroit donné, de profiter de
+l'intervention pour réécrire le code concerné lorsque cela est possible. Chez
+Free Mobile, cette logique a résulté d'une évolution de la stratégie,
+privilégiant cette réécriture « au fil de l'eau » plutôt qu'une reprise de
+contrôle purement frontale.
+
+\subsection{Des dettes de nature différente}
+Si la logique est commune, la dette ne s'exprimait pas de la même façon d'une
+entreprise à l'autre, ce qui conditionnait la marge de manœuvre disponible.
+
+Chez Free Mobile, la dette tenait surtout à la multiplication de \emph{forks}
+dotés de spécificités, vraisemblablement créés faute de temps pour produire de
+nouvelles versions. Le code restait toutefois globalement compréhensible et
+logique, malgré certains choix architecturaux discutables et une méconnaissance
+de quelques outils externes — par exemple le recours à des requêtes SQL là où
+des mécanismes plus adaptés existaient.
+
+Chez Beemo, les contraintes de réécriture étaient bien plus fortes. Le code y
+est plus cloisonné et, paradoxalement, plus lisible, mais aussi beaucoup plus
+ancien : écrit à l'origine en C, puis en C++. Pour composer avec ces
+contraintes, des \emph{patterns} ont été mis en place afin de cloisonner
+totalement le code \emph{legacy} du code moderne : les nouvelles fonctionnalités
+sont écrites dans une librairie embarquée puis injectée dans le code historique.
+Le développement suit alors un cours classique ; lorsqu'une fonctionnalité doit
+être modernisée en profondeur, elle est réécrite côté moderne, puis « gommée »
+du code ancien. Cette étape de gommage n'a pas encore été engagée frontalement,
+afin de préserver une compatibilité permettant le \emph{merge} et le
+rapatriement de branches \emph{legacy} porteuses de correctifs non encore
+intégrés.
+
+\subsection{L'enjeu social du traitement de la dette}
+L'enjeu qui m'a le plus marqué est toutefois d'ordre social. La phase de reprise
+de contrôle totale du logiciel s'est révélée très chronophage et, pour être
+honnête, peu gratifiante pour les développeurs. J'ai ainsi pu observer chez
+certains collègues une perte de motivation parfaitement compréhensible : si la
+technique constitue un domaine en soi très intéressant, passer des heures dans
+du code \emph{legacy} peu agréable à lire, pour n'y greffer que de petits
+ajouts au sein d'un existant déjà complexe, n'a rien de particulièrement
+attrayant.
+
+Ce constat n'est pas anecdotique : pour qu'une dette technique soit
+correctement résorbée, l'enjeu humain — motivation des équipes et reconnaissance
+d'un travail ingrat — me paraît, au regard de ces deux années d'alternance, tout
+aussi déterminant que les choix d'outillage ou d'architecture.
 
 \section{Leviers de réduction}
 % TODO : tests automatisés & non-régression, \gls{ci}/\gls{cd},
@@ -35,6 +115,18 @@
 \emph{[À rédiger.]}
 
 \section{Grille de lecture des missions}
-% TODO : petit paragraphe-charnière reliant la théorie aux 4 tâches qui
+% TODO : petit paragraphe-charnière reliant la théorie aux 7 tâches qui
 % suivent (tableau optionnel : tâche -> type de dette -> levier -> bénéfice).
-\emph{[À rédiger.]}
+Les missions présentées dans la suite partagent un contexte commun, qui en
+constitue le fil conducteur : l'absence de tests, qu'ils soient unitaires ou
+d'intégration. À l'origine, ces logiciels n'en comportaient aucun ; à mon
+arrivée chez Free Mobile, l'équipe montée par David Desmarest en avait certes
+introduit quelques-uns, mais la couverture demeurait globalement insuffisante.
+
+Cette dette de test se double d'une connaissance fonctionnelle souvent
+parcellaire des logiciels appelés à évoluer. La conjonction de ces deux
+facteurs expose à de forts risques de régression dès qu'une modification est
+apportée : c'est précisément ce qui justifie la mise en place d'une stratégie
+de tests et qui rend, plus largement, le développement de nouvelles
+fonctionnalités difficile. Chacune des tâches qui suivent peut ainsi se lire
+comme une réponse à une facette de ce constat.

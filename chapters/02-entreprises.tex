@@ -8,23 +8,56 @@
 % =====================================================================
 
 \section{Free Mobile}
-% TODO (≈ 1/2 à 3/4 page) :
-% - secteur (opérateur télécom), groupe Iliad
-% - taille / organisation pertinente pour ta mission
-% - l'équipe/le service où tu étais et son rôle
-% - le ou les logiciels concernés par tes missions (sans dévoiler de
-%   confidentiel)
-\emph{[À rédiger.]}
+Free Mobile est un opérateur de télécommunications du groupe Iliad, fondé
+par Xavier Niel. L'entreprise est notamment connue pour être entrée sur le
+marché de la téléphonie mobile de manière agressive, en particulier avec son
+forfait à deux euros. Au-delà de ses offres commerciales, Free Mobile fait
+partie des rares opérateurs à maîtriser l'ensemble de leurs logiciels en
+interne : tout leur cœur de réseau y est développé, de même que la
+valorisation, et l'entreprise dispose en outre d'une section R\&D dédiée à
+ses propres équipements matériels.
+
+J'ai intégré l'équipe Valo, rattachée au Core SI. Cette équipe a la charge
+du logiciel de valorisation, qui calcule la valeur de l'ensemble des appels
+passés en téléphonie mobile sur les différents réseaux.
+
+À mon arrivée, ce logiciel se trouvait dans un contexte de dette technique
+élevée : l'ingénieur qui en assurait la maintenance avait quitté
+l'entreprise, et plusieurs règles de génie logiciel n'avaient pas été
+respectées — une partie des sources n'étant par exemple pas versionnée sous
+Git. L'équipe, montée et dirigée par David Desmarest, s'est vu confier une
+mission de reprise de contrôle de ce logiciel.
+
+Mon rôle y était transverse au travail de l'équipe de développement :
+supporter celle-ci en produisant des outils internes, au premier rang
+desquels le framework de test détaillé au chapitre~\ref{chap:t3}.
 
 \section{Beemo Technologie}
-% TODO (≈ 1/2 à 3/4 page) :
-% - activité de l'entreprise (produit/domaine)
-% - taille / organisation
-% - l'équipe où tu étais et le contexte produit
-\emph{[À rédiger.]}
+Beemo Technologie est une entreprise d'une vingtaine d'années spécialisée
+dans la sauvegarde de données. Sa particularité est de ne pas se limiter à
+un logiciel installé sur une machine du client, mais de proposer une
+solution clé en main : des boîtiers (\emph{box}) déployés au sein de
+l'entreprise — voire chez son dirigeant — qui assurent la sauvegarde et la
+duplication des données, et donc leur redondance en cas de perte.
+
+L'entreprise compte une trentaine d'employés et dispose de clients et de
+partenaires partout dans le monde ; elle se développe actuellement sur le
+continent africain. Une partie des effectifs est dédiée à une \emph{hotline},
+reconnue pour sa réactivité et son efficacité dans la résolution des
+problèmes. Beemo se distingue enfin par le caractère souverain de sa solution
+de sauvegarde, un atout particulièrement recherché dans le contexte actuel.
+
+J'ai intégré l'équipe de développement à la suite d'une proposition de David
+Desmarest, qui, après avoir quitté Free Mobile, en avait pris la direction.
+À la différence de Free Mobile, où mon rôle était transverse et orienté support,
+j'occupais ici un poste de développeur travaillant directement sur le
+fonctionnel. Le contexte restait toutefois marqué par la dette technique :
+l'enjeu était de demeurer productif face au marché — c'est-à-dire de
+continuer à livrer de nouvelles fonctionnalités — tout en résorbant
+progressivement cette dette.
 
 \section{Positionnement des missions}
-% TODO (quelques lignes) : situer les 4 tâches dans le temps et entre les
+% TODO (quelques lignes) : situer les 7 tâches dans le temps et entre les
 % deux entreprises (ce qui sera détaillé dans le diagramme de Gantt en
 % annexe). Tableau de synthèse ci-dessous.
 
@@ -34,7 +67,10 @@
 \toprule
 \textbf{Entreprise} & \textbf{Tâche} & \textbf{Objectif au regard de la dette technique} \\
 \midrule
+Free Mobile & Duplication Grafana & Fiabiliser la réplication de la supervision \\
+Free Mobile & Compilation C++ & Maîtriser le coût de compilation (CPU/RAM) \\
 Free Mobile & Framework de test & Industrialiser la non-régression \\
+Free Mobile & Extension VsCode & Améliorer la productivité des développeurs \\
 Free Mobile & Portage multi-forks & Mutualiser la qualité sur les variantes \\
 Beemo      & Rétro-ing. SDK    & Débloquer une compilation existante \\
 Beemo      & Dév. feature      & Livrer sans accroître la dette \\
