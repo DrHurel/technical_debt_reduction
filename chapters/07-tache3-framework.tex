@@ -1,6 +1,6 @@
-\chapter{Tâche 3 — Framework de test d'intégration et de non-régression}
+\chapter{Un framework de test d'intégration et de non-régression}
 \label{chap:t3}
-% Entreprise : Free Mobile
+% Entreprise : Free Mobile — Volet « outiller la qualité » (2/4)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -90,16 +90,39 @@ comparaison des snapshots étant déléguées à la bibliothèque \textbf{syrupy
 \end{figure}
 
 \section{Réalisation}
-% TODO : illustrer par un EXTRAIT de code commenté (pas le code entier).
-% Exemple de gabarit listing :
-% \begin{lstlisting}[language=Python,caption={Définition d'un cas de test.},label={lst:t1}]
-% def test_exemple():
-%     ...
-% \end{lstlisting}
-\emph{[À rédiger.]}
+Du point de vue du rédacteur de test, tout tient dans le scénario YAML :
+une suite d'instructions déclaratives, jouées séquentiellement, qui décrivent
+un flux d'appel et les vérifications attendues. L'extrait ci-dessous illustre
+la forme générale d'un scénario.
+
+\begin{lstlisting}[caption={Scénario de test déclaratif : un appel voix et sa vérification (extrait illustratif).},label={lst:t3-scenario}]
+# Chaque ligne est une instruction du langage de test : le scenario
+# decrit QUOI verifier, jamais COMMENT (aucune logique possible).
+- declarer_abonne:   # prepare un abonne de test avec un solde connu
+    msisdn: "33600000001"
+    solde: 10.0
+
+- appel_voix:        # simule les trames TCP d'un appel de 2 minutes
+    appelant: "33600000001"
+    duree: 120
+
+- verifier_valorisation:   # l'etat produit (solde, tickets en base)
+    msisdn: "33600000001"  # est serialise puis compare au snapshot
+                           # de reference valide par l'equipe
+\end{lstlisting}
+
+Côté framework, chaque nom d'instruction est résolu via le \emph{registry}
+des commandes : la \emph{factory} instancie l'objet \emph{Command}
+correspondant, qui encapsule l'envoi des trames TCP au \emph{Valo Engine} —
+reconstituées en Python grâce aux structures \texttt{ctypes} équivalentes aux
+structures C du protocole. Les instructions de vérification, elles, ne
+contiennent aucune assertion explicite : elles sérialisent l'état observé
+(actions jouées, contenu de la base), que syrupy compare au \emph{snapshot}
+de référence. Un test échoue donc pour une raison et une seule : l'état
+produit par le moteur a divergé de l'état validé — c'est-à-dire une
+régression.
 
 \section{Difficultés rencontrées}
-% TODO : ex. environnements non reproductibles, données de test, flakiness.
 S'agissant de l'une des premières missions d'envergure qui m'étaient confiées,
 la principale difficulté a tenu au \textbf{découpage du travail}. Plutôt que de
 procéder par versions intermédiaires, livrables et vérifiables au fur et à
@@ -115,6 +138,23 @@ reporting éprouvé, il recèle aussi de nombreux mécanismes implicites — sa
 compliquer le développement d'une surcouche.
 
 \section{Résultats et bénéfice business}
-% TODO : couverture obtenue, régressions détectées, temps gagné,
-% confiance dans les livraisons. Relier au chapitre \ref{chap:veille}.
-\emph{[À rédiger.]}
+% TODO (auteur) : si disponible, chiffrer (nombre de scénarios, régressions
+% détectées avant mise en production).
+Le framework a remplacé la suite Lua sur l'ensemble de son périmètre
+fonctionnel — appels voix, SMS, MMS, consommation de data et vérification des
+données produites — en éliminant sa fragilité structurelle : les scénarios
+étant purement déclaratifs, l'échec d'un test signale désormais une
+régression du moteur, et non un défaut du test. C'est toute la valeur du
+filet de sécurité qui s'en trouve restaurée : l'équipe peut faire confiance
+au verdict de la suite, condition première pour que les tests soient
+réellement consultés et maintenus.
+
+Au regard du fil rouge (chapitre~\ref{chap:veille}), cette mission actionne
+le levier central identifié par Feathers~\cite{feathers2004} : doter un code
+legacy de tests pour rendre possible toute intervention ultérieure. Le
+framework est, de fait, devenu une infrastructure : il a servi de socle à
+l'extension VS~Code (chapitre~\ref{chap:t4}) puis au portage vers les forks
+legacy (chapitre~\ref{chap:t5}), où il a fait du filet de non-régression un
+préalable aux correctifs de stabilisation. Représentant à terme de l'ordre de
+30~000 lignes de code, il constitue la réalisation la plus structurante de
+mon passage chez Free Mobile.

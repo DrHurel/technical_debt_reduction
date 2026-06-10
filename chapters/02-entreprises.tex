@@ -57,25 +57,35 @@ continuer à livrer de nouvelles fonctionnalités — tout en résorbant
 progressivement cette dette.
 
 \section{Positionnement des missions}
-% TODO (quelques lignes) : situer les 7 tâches dans le temps et entre les
-% deux entreprises (ce qui sera détaillé dans le diagramme de Gantt en
-% annexe). Tableau de synthèse ci-dessous.
+Sept missions jalonnent ces deux années : cinq chez Free Mobile, deux chez
+Beemo Technologie — ces dernières étant encore en cours au moment de la
+rédaction. Plutôt que de les présenter dans l'ordre chronologique — restitué
+par le diagramme de Gantt en annexe~\ref{chap:annexes} —, ce mémoire les
+regroupe par nature, en trois volets : \textbf{outiller la qualité et la
+non-régression}, \textbf{maîtriser la chaîne de production logicielle}, et
+\textbf{développer une fonctionnalité dans un existant endetté}. Le
+tableau~\ref{tab:missions} en donne la vue d'ensemble.
 
 \begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{@{}l l X@{}}
 \toprule
-\textbf{Entreprise} & \textbf{Tâche} & \textbf{Objectif au regard de la dette technique} \\
+\textbf{Volet / Entreprise} & \textbf{Mission} & \textbf{Objectif au regard de la dette technique} \\
 \midrule
+\multicolumn{3}{@{}l}{\emph{Outiller la qualité et la non-régression}} \\
 Free Mobile & Duplication Grafana & Fiabiliser la réplication de la supervision \\
-Free Mobile & Compilation C++ & Maîtriser le coût de compilation (CPU/RAM) \\
 Free Mobile & Framework de test & Industrialiser la non-régression \\
-Free Mobile & Extension VsCode & Améliorer la productivité des développeurs \\
+Free Mobile & Extension VS Code & Améliorer la productivité des développeurs \\
 Free Mobile & Portage multi-forks & Mutualiser la qualité sur les variantes \\
-Beemo      & Rétro-ing. SDK    & Débloquer une compilation existante \\
-Beemo      & Dév. feature      & Livrer sans accroître la dette \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Maîtriser la chaîne de production logicielle}} \\
+Free Mobile & Compilation C++ & Maîtriser le coût de compilation (CPU/RAM) \\
+Beemo      & Rétro-ing. SDK    & Débloquer et documenter une compilation existante \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Développer dans un existant endetté}} \\
+Beemo      & Immuabilité       & Livrer une fonctionnalité sans accroître la dette \\
 \bottomrule
 \end{tabularx}
-\caption{Vue d'ensemble des missions.}
+\caption{Vue d'ensemble des missions, regroupées par nature.}
 \label{tab:missions}
 \end{table}

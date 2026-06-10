@@ -1,6 +1,6 @@
-\chapter{Tâche 4 — Outillage du framework : extension VS Code (LSP et débogueur)}
+\chapter{Outillage du framework : une extension VS Code (LSP et débogueur)}
 \label{chap:t4}
-% Entreprise : Free Mobile
+% Entreprise : Free Mobile — Volet « outiller la qualité » (3/4)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -13,7 +13,7 @@
 % =====================================================================
 
 \section{Contexte et dette technique initiale}
-Une fois le framework de test livré (tâche~3, chapitre~\ref{chap:t3}), un nouveau
+Une fois le framework de test livré (chapitre~\ref{chap:t3}), un nouveau
 frein est apparu : la rédaction des tests elle-même. Les scénarios sont décrits
 en YAML, support sur lequel l'écriture ne bénéficie d'aucune assistance
 contextuelle. Là où des langages comme Python, Lua ou C++ disposent d'un serveur
@@ -33,7 +33,8 @@ du framework par l'équipe : une dette « d'outillage ».
 
 \section{Objectif de la mission}
 La mission a consisté à développer une extension \emph{Visual Studio Code},
-écrite en \textbf{TypeScript}, au service du framework de la tâche~3. Cette
+écrite en \textbf{TypeScript}, au service du framework du
+chapitre~\ref{chap:t3}. Cette
 extension réunit deux facettes complémentaires :
 \begin{itemize}
   \item un \textbf{serveur de langage} (\gls{lsp}) apportant autocomplétion,
@@ -141,10 +142,20 @@ de coordonner deux canaux de communication (\gls{dap} et HTTP) au sein d'une mê
 session de débogage.
 
 \section{Résultats et bénéfice business}
-% TODO : quantifier si possible (temps d'écriture d'un test, erreurs évitées,
-%        taux d'adoption). Relier au thème dette technique (chap.~\ref{chap:veille}).
-\emph{[À rédiger : temps d'écriture d'un test réduit grâce à l'autocomplétion et
-aux diagnostics en temps réel, erreurs de syntaxe détectées avant l'exécution,
-diagnostic accéléré des comportements inattendus — jusque dans le code C++ du
-moteur — et, in fine, meilleure adoption du framework par l'équipe. À relier au
-thème de la dette technique, chapitre~\ref{chap:veille}.]}
+% TODO (auteur) : si disponible, chiffrer (temps d'écriture d'un test,
+%        nombre d'utilisateurs dans l'équipe).
+L'extension a déplacé la détection des erreurs \textbf{en amont de
+l'exécution} : les fautes de syntaxe et les instructions inconnues sont
+signalées au fil de la frappe, et l'autocomplétion contextuelle guide le
+rédacteur dans la grammaire du format de test — là où il fallait auparavant
+lancer le scénario pour découvrir la moindre coquille. L'écriture d'un test
+cesse ainsi d'être réservée à qui connaît le framework par cœur.
+
+Le débogueur transforme, lui, le diagnostic des échecs : au lieu de déduire
+la cause d'une régression à partir du seul compte rendu final, on rejoue le
+scénario pas à pas en observant l'état du \emph{Valo Engine} à chaque
+instruction — jusqu'à descendre, si besoin, dans son code C++. Ce confort
+n'est pas accessoire : un outil de qualité n'a d'effet sur la dette que s'il
+est \emph{adopté}, et c'est précisément cette barrière d'entrée que
+l'extension abaisse (chapitre~\ref{chap:veille}). Elle convertit le framework
+d'un outil d'expert en un outil d'équipe.

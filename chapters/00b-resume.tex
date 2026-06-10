@@ -1,18 +1,49 @@
 \chapter*{Résumé}
 \addcontentsline{toc}{chapter}{Résumé}
 
-% TODO : 10-15 lignes synthétisant : contexte (alternance, 2 entreprises),
-% fil rouge (dette technique & enjeux business), 7 tâches, résultats clés.
+Ce mémoire retrace une alternance de deux années menée au sein de deux
+entreprises — Free Mobile, opérateur de télécommunications du groupe Iliad,
+puis Beemo Technologie, éditeur d'une solution souveraine de sauvegarde de
+données — autour d'un fil conducteur commun : la maîtrise de la
+\gls{dette-technique} et les enjeux business qui lui sont associés.
 
-\emph{[Résumé à rédiger.]} Ce mémoire retrace une alternance menée au sein
-de deux entreprises — Free Mobile puis Beemo Technologie — autour d'un fil
-conducteur commun : la réduction de la \gls{dette-technique} et les enjeux
-business qui lui sont associés. \emph{[...]}
+Chez Free Mobile, au sein de l'équipe en charge du logiciel de valorisation
+des appels, les missions ont consisté à outiller la reprise de contrôle d'un
+logiciel critique : automatisation de la duplication de la supervision
+Grafana, conception d'un framework de test d'intégration et de non-régression
+à scénarios déclaratifs, développement d'une extension VS~Code (serveur de
+langage et débogueur) au service de ce framework, portage de celui-ci vers
+les \emph{forks} legacy du moteur, et maîtrise du coût de compilation d'une
+base C++ conséquente. Chez Beemo Technologie, le travail s'est poursuivi sur
+deux fronts : une démarche de rétro-ingénierie pour rendre reproductible la
+compilation d'un agent avec le SDK d'un constructeur, puis le développement
+d'une fonctionnalité de production — l'immuabilité des jeux de sauvegarde —
+injectée dans un firmware fortement endetté sans aggraver son état.
+
+À travers ces missions, le mémoire montre que la dette technique n'est pas
+qu'un problème de code : c'est un arbitrage économique permanent entre
+\emph{time-to-market} et soutenabilité du logiciel, dont le traitement engage
+autant l'outillage et l'architecture que la motivation des équipes.
 
 \vspace{1em}
 \noindent\textbf{Mots-clés :} dette technique, tests automatisés,
 non-régression, intégration continue, rétro-ingénierie, qualité logicielle.
 
 \vspace{2em}
-\noindent\textbf{Abstract.} \emph{[Traduction anglaise du résumé —
-facultatif mais apprécié.]}
+\noindent\textbf{Abstract.} This report covers a two-year work-study program
+carried out in two companies — Free Mobile, a telecommunications operator of
+the Iliad group, then Beemo Technologie, vendor of a sovereign data-backup
+solution — around a common thread: managing technical debt and its business
+implications. At Free Mobile, within the team in charge of the call-rating
+software, the work focused on tooling the recovery of a critical legacy
+system: an integration and non-regression test framework based on declarative
+scenarios, a VS~Code extension (language server and debugger) supporting it,
+its porting to the legacy forks of the engine, as well as supervision tooling
+and build-cost control of a large C++ codebase. At Beemo Technologie, a
+reverse-engineering effort made the compilation of an agent with a vendor SDK
+reproducible, before a production feature — backup-set immutability — was
+developed inside a heavily indebted firmware without increasing its debt.
+These missions show that technical debt is not merely a code issue but a
+permanent economic trade-off between time-to-market and software
+sustainability, whose resolution involves tooling and architecture as much as
+team motivation.

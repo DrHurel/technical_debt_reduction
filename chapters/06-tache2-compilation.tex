@@ -1,6 +1,6 @@
-\chapter{Tâche 2 — Maîtrise du coût de compilation du Valo Engine}
+\chapter{Maîtrise du coût de compilation du Valo Engine}
 \label{chap:t2}
-% Entreprise : Free Mobile
+% Entreprise : Free Mobile — Volet « maîtriser la chaîne de production » (1/2)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -103,8 +103,15 @@ au prix d'un allongement du temps de compilation, et le bon réglage dépend
 En bornant la concurrence de la phase de liaison, la compilation redevient
 \textbf{soutenable} sur les machines de développement : elle peut être menée à
 son terme sans saturer la RAM, là où une parallélisation naïve la faisait
-échouer. Au-delà du résultat immédiat, cette mission a été l'occasion de
+échouer — le tout en conservant un parallélisme maximal sur la phase de
+compilation proprement dite, qui représente l'essentiel de la durée totale.
+Pour l'équipe, le bénéfice est direct : un \emph{build} fiable est la
+condition de toute boucle de développement courte, et donc de toute
+intervention sereine sur le code.
+
+Au-delà du résultat immédiat, cette mission a été l'occasion de
 \textbf{mettre au jour une dette de fond} — le coût du modèle de compilation C++
 préalable aux modules —, dont la résorption complète reste suspendue à la
-maturation du support de C++20/23 dans les compilateurs. \emph{[À compléter :
-temps de compilation obtenu et seuil de concurrence retenu.]}
+maturation du support de C++20/23 dans les compilateurs.
+% TODO (auteur) : si disponible, chiffrer le temps de compilation obtenu et
+%        le seuil de concurrence retenu pour l'édition des liens.

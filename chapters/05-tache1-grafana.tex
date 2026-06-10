@@ -1,6 +1,6 @@
-\chapter{Tâche 1 — Outil de duplication de configuration Grafana}
+\chapter{Un outil de duplication de configuration Grafana}
 \label{chap:t1}
-% Entreprise : Free Mobile
+% Entreprise : Free Mobile — Volet « outiller la qualité » (1/4)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -88,12 +88,20 @@ l'appariement} des sources de données, l'appariement par nom supposant une
 nomenclature cohérente d'une instance à l'autre.
 
 \section{Résultats et bénéfice business}
-% TODO : quantifier si possible (temps de synchronisation avant/après, erreurs
-%        évitées). Relier au thème dette technique (chap.~\ref{chap:veille}).
+% TODO (auteur) : si disponible, chiffrer le gain (durée de la procédure
+%        manuelle avant / exécution de l'outil après).
 L'outil a transformé une synchronisation manuelle et faillible en une opération
-\textbf{automatisée et reproductible}, supprimant la classe d'erreurs liée aux
-identifiants de sources de données mal réécrits. Au-delà du livrable, cette
-première mission a joué un rôle de \textbf{mise en jambe} : prise de contact avec
-l'équipe et son environnement, et découverte de Textual, un framework réinvesti
-par la suite. \emph{[À compléter : gain de temps mesuré sur la synchronisation
-des instances.]}
+\textbf{automatisée et reproductible} : là où la procédure exigeait d'exporter,
+copier puis corriger chaque tableau de bord à la main, la duplication complète
+d'une instance se réduit désormais à l'exécution de l'outil. La classe
+d'erreurs liée aux identifiants de sources de données mal réécrits disparaît
+purement et simplement — et avec elle les tableaux de bord silencieusement
+cassés sur les instances secondaires, c'est-à-dire des angles morts de
+supervision sur un logiciel critique.
+
+Au regard du fil rouge de ce mémoire (chapitre~\ref{chap:veille}), cette
+mission illustre le levier de l'\textbf{outillage} : une dette d'exploitation
+modeste en apparence, mais remboursée une fois pour toutes par
+l'automatisation. Au-delà du livrable, elle a joué un rôle de \textbf{mise en
+jambe} : prise de contact avec l'équipe et son environnement, et découverte
+de Textual, un framework réinvesti par la suite.

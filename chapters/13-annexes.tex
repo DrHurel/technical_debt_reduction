@@ -8,16 +8,72 @@
 % =====================================================================
 
 \section{Diagramme de Gantt}
-% TODO : insérer le Gantt final. Deux options :
-%  (a) image exportée : \includegraphics[width=\textwidth]{gantt.png}
-%  (b) généré en LaTeX avec le package pgfgantt (décommenter le \usepackage
-%      dans main.tex et utiliser l'environnement ganttchart ici).
-\emph{[À insérer.]}
+Le diagramme ci-dessous restitue la chronologie des missions sur les deux
+années d'alternance, le corps du mémoire les présentant quant à lui
+regroupées par nature.
 
-\section{Extrait de code choisi}
-% TODO (facultatif) : un extrait représentatif, p.ex. le cœur du framework
-% de test ou le patch de compilation.
-% \begin{lstlisting}[caption={Extrait représentatif.}]
-% ...
-% \end{lstlisting}
-\emph{[Facultatif.]}
+% TODO (auteur) : AJUSTER les dates réelles de chaque mission (bornes posées
+% ici d'après la trame du mémoire : Free Mobile puis Beemo début 2026,
+% framework « étalé sur près d'un an et demi » avec son outillage).
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}[
+    hgrid, vgrid,
+    time slot format=isodate-yearmonth,
+    time slot unit=month,
+    x unit=0.6cm, y unit chart=0.62cm,
+    title label font=\footnotesize,
+    bar label font=\small,
+    group label font=\small\bfseries,
+    bar/.append style={fill=coral!70, draw=coraldeep},
+    group/.append style={fill=muted, draw=muted},
+    milestone/.append style={fill=coraldeep, draw=coraldeep}
+  ]{2024-09}{2026-08}
+  \gantttitlecalendar{year} \\
+  \gantttitlecalendar{month=shortname} \\
+  \ganttgroup{Free Mobile}{2024-09}{2026-01} \\
+  \ganttbar{Duplication Grafana}{2024-09}{2024-10} \\
+  \ganttbar{Coût de compilation C++}{2024-11}{2024-12} \\
+  \ganttbar{Framework de test}{2025-01}{2025-08} \\
+  \ganttbar{Extension VS Code (LSP/DAP)}{2025-08}{2025-11} \\
+  \ganttbar{Portage forks legacy}{2025-11}{2026-01} \\
+  \ganttgroup{Beemo Technologie}{2026-02}{2026-08} \\
+  \ganttbar{Rétro-ingénierie DSDK}{2026-02}{2026-04} \\
+  \ganttbar{Immuabilité (en cours)}{2026-04}{2026-08}
+\end{ganttchart}%
+}
+\caption{Chronologie des missions de l'alternance.}
+\label{fig:gantt}
+\end{figure}
+
+\section{Extrait de code choisi : un scénario de test complet}
+L'extrait suivant complète le chapitre~\ref{chap:t3} en montrant un scénario
+de test du framework dans son intégralité : préparation de l'abonné,
+simulation d'un flux d'appel mêlant voix et SMS, puis vérifications par
+\emph{snapshot}.
+
+\begin{lstlisting}[caption={Scénario complet de non-régression sur un flux voix + SMS (illustratif).},label={lst:annexe-scenario}]
+# --- Preparation -----------------------------------------------------
+- declarer_abonne:          # abonne de test, solde initial connu
+    msisdn: "33600000001"
+    solde: 15.0
+    offre: "forfait_2euros"
+
+# --- Flux d'appel simule --------------------------------------------
+- appel_voix:               # trames TCP identiques a celles du reseau
+    appelant: "33600000001"
+    appele:   "33600000002"
+    duree: 180              # secondes
+
+- envoi_sms:
+    emetteur: "33600000001"
+    destinataire: "33600000002"
+
+# --- Verifications (comparees au snapshot de reference) -------------
+- verifier_valorisation:    # tickets produits et solde decompte
+    msisdn: "33600000001"
+
+- verifier_notifications:   # seuils de consommation eventuels
+    msisdn: "33600000001"
+\end{lstlisting}

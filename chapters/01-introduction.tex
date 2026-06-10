@@ -9,27 +9,65 @@
 % =====================================================================
 
 \section{Contexte de l'alternance}
-% TODO : place dans le cursus (Master Informatique, année), nature
-% (alternance), période globale, et le fait qu'elle s'est déroulée dans
-% DEUX entreprises successives : Free Mobile puis Beemo Technologie.
-\emph{[À rédiger.]}
+% TODO (auteur) : vérifier/préciser les dates exactes de début et de fin.
+Ce mémoire rend compte de l'alternance effectuée dans le cadre de mon Master
+Informatique à la Faculté des Sciences de l'Université de Montpellier.
+Réalisée sur deux années, de septembre 2024 à septembre 2026, elle présente
+une particularité : elle s'est déroulée dans \textbf{deux entreprises
+successives}. J'ai d'abord intégré \textbf{Free Mobile}, opérateur de
+télécommunications du groupe Iliad, au sein de l'équipe en charge du logiciel
+de valorisation des appels ; j'ai ensuite rejoint \textbf{Beemo Technologie},
+éditeur d'une solution de sauvegarde de données, pour y achever mon
+alternance en tant que développeur. La soutenance intervenant avant le terme
+du contrat, certains travaux présentés ici sont encore en cours au moment de
+la rédaction.
 
 \section{Le fil conducteur : la dette technique}
-% TODO : amener le thème. Idée directrice : derrière des missions
-% techniques variées (framework de test, portage multi-forks,
-% rétro-ingénierie de compilation, développement de feature), un même
-% enjeu — maîtriser/réduire la dette technique — et un même argument
-% business — vitesse de livraison, fiabilité, coût de maintenance.
-\emph{[À rédiger : poser la problématique et les enjeux business.]}
+Derrière des missions techniques en apparence hétérogènes — outil de
+duplication de supervision, framework de test, extension d'éditeur, maîtrise
+d'une chaîne de compilation, rétro-ingénierie d'un \gls{sdk}, développement
+d'une fonctionnalité de production — un même enjeu traverse l'ensemble de
+cette alternance : la \gls{dette-technique}. Dans les deux entreprises, j'ai
+été confronté à des logiciels critiques pour l'activité, mais dégradés par
+les années : sources partiellement non versionnées, absence de tests,
+\emph{forks} multipliés, chaînes de compilation opaques, savoir concentré sur
+des personnes ayant quitté — ou sur le point de quitter — l'entreprise.
+
+Or cette dette n'est jamais un problème purement technique. Elle se paie en
+ralentissement des livraisons, en risque de régression sur des composants
+dont la défaillance se chiffre en argent réel, et en démotivation des
+équipes. La traiter relève donc d'un arbitrage économique : continuer à
+livrer de la valeur pour rester compétitif, tout en investissant dans la
+soutenabilité du logiciel.
 
 \section{Problématique}
-% TODO : formuler la question centrale, p.ex. :
-% « Comment des actions d'ingénierie ciblées permettent-elles de réduire
-%  la dette technique, et en quoi se traduisent-elles en valeur pour
-%  l'entreprise ? »
-\emph{[À rédiger.]}
+La question centrale que ce mémoire cherche à éclairer peut se formuler
+ainsi : \emph{comment des actions d'ingénierie ciblées — outillage, tests,
+maîtrise de la chaîne de production, architecture d'isolation — permettent-elles
+de maîtriser la dette technique d'un logiciel en exploitation, et en quoi
+cette maîtrise se traduit-elle en valeur pour l'entreprise ?} Chaque mission
+présentée dans la suite constitue une réponse partielle à cette question, sur
+un terrain et avec des contraintes à chaque fois différents.
 
 \section{Plan du mémoire}
-% TODO : annoncer brièvement le déroulé (entreprises, environnement
-% technique, veille sur la dette technique, puis les 7 tâches, conclusion).
-\emph{[À rédiger.]}
+Le chapitre~\ref{chap:entreprises} présente brièvement les deux entreprises
+et le positionnement de mes missions ; le chapitre~\ref{chap:env} décrit,
+succinctement, l'environnement technique commun à ces travaux. Le
+chapitre~\ref{chap:veille} pose ensuite le cadre conceptuel — définition,
+typologie et enjeux business de la dette technique — qui sert de grille de
+lecture aux travaux effectués.
+
+Ces travaux sont regroupés par nature plutôt que par chronologie. Un premier
+volet rassemble les missions visant à \textbf{outiller la qualité et la
+non-régression} : duplication de la supervision Grafana
+(chapitre~\ref{chap:t1}), framework de test (chapitre~\ref{chap:t3}),
+extension VS~Code à son service (chapitre~\ref{chap:t4}) et portage vers les
+forks legacy (chapitre~\ref{chap:t5}). Un deuxième volet porte sur la
+\textbf{maîtrise de la chaîne de production logicielle} : coût de compilation
+du moteur C++ (chapitre~\ref{chap:t2}) et rétro-ingénierie d'un SDK
+constructeur (chapitre~\ref{chap:t6}). Le dernier volet illustre le
+\textbf{développement d'une fonctionnalité de production dans un existant
+endetté} (chapitre~\ref{chap:t7}). La conclusion dresse le bilan fonctionnel
+de ces missions et revient sur les apports de l'alternance ; la chronologie
+détaillée des travaux figure dans le diagramme de Gantt en
+annexe~\ref{chap:annexes}.

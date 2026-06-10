@@ -1,12 +1,12 @@
-\chapter{Tâche 5 — Portage du framework vers les forks legacy du Valo Engine}
+\chapter{Portage du framework vers les forks legacy du Valo Engine}
 \label{chap:t5}
-% Entreprise : Free Mobile
+% Entreprise : Free Mobile — Volet « outiller la qualité » (4/4)
 
 \section{Contexte et dette technique initiale}
 % TODO : pourquoi plusieurs \gls{fork} du programme initial existent-ils ?
 % Quelle dette cela crée-t-il (duplication de tests, divergence, double
 % maintenance) ? C'est le « problème business » à résoudre.
-Le framework de test (tâche~3, chapitre~\ref{chap:t3}) avait été conçu pour le
+Le framework de test (chapitre~\ref{chap:t3}) avait été conçu pour le
 \emph{Valo Engine} du \textbf{réseau prépayé} de Free Mobile, un réseau alors
 nouveau. Une fois ce dernier mis en production et jugé \textbf{stable}, la
 stratégie de gestion de la dette technique a été révisée — une inflexion qui a
@@ -115,6 +115,72 @@ du prépayé, beaucoup plus moderne et doté d'un service de testing exposant un
 accueillir des tests}. Il a donc fallu trouver le moyen de les \textbf{démarrer},
 de les \textbf{arrêter} et de \textbf{dialoguer} avec eux, sans le point d'entrée
 dédié dont bénéficiait le prépayé.
+
+\section{Expérimentation : l'IA agentique au service de la transmission}
+% Retour d'expérience sur l'usage des LLM agentiques (Cursor, agent OpenAI)
+% pendant le portage et la transmission à Jérémy. Corrobore une étude IBM
+% sur les impacts des LLM sur la production de code.
+La révision de la stratégie de gestion de la dette technique s'est accompagnée
+d'une inflexion plus large dans la manière dont Free Mobile entendait voir ses
+\textbf{logiciels internes développés}. L'entreprise a notamment revu sa
+\textbf{politique vis-à-vis des IA externes} et déployé des \textbf{licences
+d'\gls{ia-agentique}} — au premier rang desquelles \textbf{Cursor} — à
+l'ensemble de ses développeurs. Ce portage, mené en binôme et placé sous le
+signe de la \textbf{transmission de connaissances}, m'a offert un terrain
+d'\textbf{expérimentation} idéal pour éprouver les capacités de production
+réelles de ces outils. Les observations qui suivent rejoignent assez fidèlement
+les conclusions d'une étude d'IBM sur les impacts de l'usage des \gls{llm} pour
+produire du code~\cite{ibm-llm}.
+
+Le framework reposait sur un socle \emph{core} / \emph{spec} (section
+précédente) pensé, après refonte, pour \textbf{supporter son extensibilité}.
+Cette qualité d'architecture s'est révélée déterminante : tant que l'on demeurait
+dans un \textbf{cadre déjà balisé} — décrire un nouveau fork à l'aide
+d'instructions \emph{standards}, sans sortir vers des fonctionnalités encore
+\textbf{non développées} —, il était relativement simple de \textbf{guider le
+\gls{llm}} vers le résultat attendu. Sur ce périmètre, le gain de
+\textbf{productivité} fut considérable.
+
+Deux facteurs sont toutefois apparus comme \textbf{conditionnant} ce gain.
+
+Le premier tient à la \textbf{maîtrise préalable de l'architecture}. Ayant
+réalisé l'essentiel du framework — quoique d'autres développeurs y aient
+également contribué —, j'en avais une \textbf{vision fine}, ce qui rendait
+\textbf{aisée la rédaction de \emph{prompts} adéquats} pour obtenir précisément
+ce que je visais. L'IA \textbf{amplifiait} ici une compréhension déjà constituée
+plutôt qu'elle ne s'y substituait.
+
+Le second facteur est apparu \emph{a contrario}, lors des recherches sur le
+décodage des \gls{cdr}. Ce travail a en partie été conduit par Jérémy
+\textbf{en mon absence}, durant une période de cours, à l'aide de la solution
+\textbf{agentique d'OpenAI}. Les résultats se sont révélés \textbf{décevants},
+et même \textbf{plus complexes} que la solution finalement retenue. Ce relatif
+échec s'explique avant tout par un \textbf{manque de connaissance} — à la fois du
+\textbf{code métier} sous-jacent et de l'\textbf{architecture du framework} —,
+qui empêchait de formuler les instructions justes et de juger sainement les
+propositions du modèle.
+
+Un troisième facteur, plus insidieux, a pesé sur l'expérimentation : l'IA a
+considérablement \textbf{accru la difficulté des revues de code}. Le framework de
+test avait été développé de façon relativement \textbf{isolée}, surtout depuis le
+départ de David Desmarest : peu de personnes dans l'équipe en conservaient une
+\textbf{connaissance fine}. Or un \gls{llm} produit de \textbf{grands volumes de
+code d'un seul tenant}, ce qui rendait les modifications \textbf{ardues à
+relire} — au point de soulever une question vertigineuse : ne faudrait-il pas
+\textbf{confier la revue à l'IA} elle-même ? Une telle délégation se ferait
+pourtant au \textbf{détriment de la transmission des connaissances} et de
+l'\textbf{harmonisation} du style d'écriture du code — deux garde-fous pourtant
+essentiels contre l'accumulation d'une nouvelle dette.
+
+J'en retire un constat qui fait directement écho au fil rouge de ce mémoire : le
+\gls{llm} agit comme un \textbf{levier}, non comme un substitut. Sa productivité
+est \textbf{proportionnée à la maîtrise} — de l'architecture comme du domaine
+métier — de celui qui le pilote, et à la \textbf{qualité du cadre} dans lequel il
+opère. Une base bien architecturée et extensible, c'est-à-dire \textbf{peu
+endettée}, démultiplie son apport ; à l'inverse, sur un terrain \emph{legacy} ou
+opaque, mal maîtrisé, il tend à produire un code \textbf{plus complexe} et moins
+fiable. L'outil ne dispense donc pas de la \textbf{connaissance} : il la
+\textbf{récompense}.
 
 \section{Résultats et bénéfice business}
 % TODO : maintenance unifiée, non-régression sur tous les forks d'un coup,

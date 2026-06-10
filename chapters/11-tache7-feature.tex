@@ -1,6 +1,6 @@
-\chapter{Tâche 7 — Développement d'une fonctionnalité en code de production}
+\chapter{Développement d'une fonctionnalité en code de production}
 \label{chap:t7}
-% Entreprise : Beemo Technologie
+% Entreprise : Beemo Technologie — Volet « développer dans un existant endetté »
 
 \section{Contexte et besoin}
 % TODO : présenter la feature demandée, le besoin métier/utilisateur, et
@@ -103,7 +103,7 @@ L'extrait ci-dessous en illustre le principe : une classe moderne expose le
 service d'immuabilité au reste du système, tout en dissimulant les appels au
 firmware historique derrière un pointeur opaque transmis à la construction.
 
-\begin{lstlisting}[language=C++,caption={Couche d'adaptation isolant le code neuf du firmware legacy : les appels à l'existant sont masques derriere un pointeur (extrait illustratif).},label={lst:t5}]
+\begin{lstlisting}[language=C++,caption={Couche d'adaptation isolant le code neuf du firmware legacy : les appels à l'existant sont masques derriere un pointeur (extrait illustratif).},label={lst:t7}]
 // La fonctionnalite d'immuabilite est ecrite en C++ moderne, isolee du
 // firmware historique. Le couplage impose par main.h est neutralise :
 // le code neuf ne connait l'existant qu'a travers un pointeur opaque.

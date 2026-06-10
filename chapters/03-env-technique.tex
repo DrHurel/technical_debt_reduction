@@ -55,13 +55,37 @@ requêtes d'agrégation et se prête donc particulièrement bien au calcul de
 statistiques sur de gros volumes de données.
 
 \section{Outils de build et de compilation}
-% TODO : chaîne de compilation, SDK, gestionnaires de dépendances,
-% (utile en amont de la tâche 4 « rétro-ingénierie »).
-\emph{[À rédiger.]}
+% TODO (auteur) : vérifier les outils exacts (make/CMake, versions de g++).
+Dans les deux entreprises, les logiciels C++ sont compilés sur un
+environnement Linux avec la \gls{toolchain} GNU (\texttt{g++}), pilotée par
+des \emph{makefiles}. Cette chaîne, en apparence banale, joue un rôle central
+dans deux des missions présentées : chez Free Mobile, la taille de la base de
+code rend la compilation parallèle si gourmande en ressources qu'elle devient
+elle-même un sujet d'ingénierie (chapitre~\ref{chap:t2}) ; chez Beemo, la
+compilation de l'agent VSX dépend d'un \gls{sdk} propriétaire fourni par
+Broadcom, le DSDK, qui impose sa propre chaîne et ses propres réglages
+(chapitre~\ref{chap:t6}).
+
+\textbf{Docker} complète cet outillage : il permet d'encapsuler une chaîne de
+compilation complète dans une image reproductible, et a servi chez Beemo à
+rapatrier en local un \emph{build} jusque-là confiné à une machine distante.
 
 \section{Gestion de version et intégration continue}
-% TODO : \gls{vcs} (Git ?), forge (GitLab/GitHub ?), pipelines \gls{ci}/\gls{cd}.
-\emph{[À rédiger.]}
+% TODO (auteur) : préciser la forge utilisée chez Beemo et les pipelines CI
+% réellement en place dans chaque entreprise.
+Le versionnement du code repose sur \textbf{Git} dans les deux entreprises,
+avec une forge \textbf{GitLab} chez Free Mobile, où les modifications sont
+intégrées par \emph{merge requests} soumises à revue de code. Ce
+fonctionnement, aujourd'hui standard, prend ici un relief particulier : chez
+Free Mobile, une partie des sources du logiciel de valorisation n'était
+\emph{pas} versionnée à l'arrivée de l'équipe, et certains binaires en
+production ne correspondaient plus à aucune source identifiée — un exemple
+typique de dette dont la résorption conditionne tout le reste.
+
+L'\gls{ci} s'inscrit dans la même logique : les suites de tests — dont le
+framework présenté au chapitre~\ref{chap:t3} — ont vocation à être exécutées
+automatiquement à chaque modification, de façon à détecter les régressions
+avant la mise en production plutôt qu'après.
 
 \section{Méthodologie et gestion de projet}
 Chez Free Mobile, l'organisation du travail suit une méthode \emph{agile},
