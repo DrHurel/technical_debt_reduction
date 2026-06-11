@@ -1,6 +1,7 @@
-\chapter{Un outil de duplication de configuration Grafana}
+\section{Un outil de duplication de configuration Grafana}
 \label{chap:t1}
-% Entreprise : Free Mobile — Volet « outiller la qualité » (1/4)
+% Entreprise : Free Mobile — Chapitre « outils : productivité et
+% standardisation de l'environnement » (section 1/3)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -12,12 +13,12 @@
 %  6. Résultats & bénéfice business (réduction de la dette)
 % =====================================================================
 
-\section{Contexte et dette technique initiale}
+\subsection{Contexte et dette technique initiale}
 La supervision de la valorisation s'appuie sur \textbf{Grafana}, qui agrège dans
 des \emph{dashboards} les métriques remontées par le \emph{Valo Engine}. Or cette
-supervision n'existe pas sur une seule instance : on en retrouve plusieurs
-— typiquement une par environnement (développement, recette, production) ou par
-réseau — qui doivent présenter les \textbf{mêmes tableaux de bord}. Faire vivre
+supervision n'existe pas sur une seule instance : on en retrouve plusieurs,
+typiquement une par environnement (développement, recette, production) ou par
+réseau, qui doivent présenter les \textbf{mêmes tableaux de bord}. Faire vivre
 ces instances en parallèle suppose donc de \textbf{répliquer} la configuration de
 l'une vers les autres à chaque évolution.
 
@@ -25,11 +26,11 @@ Cette réplication ne se résume pas à une copie : chaque tableau de bord réf�
 ses \textbf{sources de données} (\emph{datasources}) par un \textbf{identifiant
 propre à l'instance}. Le même tableau, copié tel quel d'une instance à l'autre,
 pointe alors vers des identifiants qui n'y existent pas, et l'affichage se
-retrouve cassé. La synchronisation manuelle — export, copie, puis correction au
-cas par cas des identifiants — était donc à la fois \textbf{fastidieuse et source
+retrouve cassé. La synchronisation manuelle (export, copie, puis correction au
+cas par cas des identifiants) était donc à la fois \textbf{fastidieuse et source
 d'erreurs} : une dette d'outillage sur la chaîne de supervision elle-même.
 
-\section{Objectif de la mission}
+\subsection{Objectif de la mission}
 La mission consistait à \textbf{reprendre le travail d'un stagiaire}, qui avait
 amorcé un \gls{poc} sur ce sujet, pour en faire un outil exploitable. Le but :
 \textbf{dupliquer l'ensemble des tableaux de bord} d'une instance Grafana vers une
@@ -39,7 +40,7 @@ est donc un \textbf{appariement} : faire correspondre, deux à deux, les sources
 de données de l'instance d'origine et celles de l'instance de destination, afin
 de substituer chaque identifiant par son équivalent.
 
-\section{Conception et choix techniques}
+\subsection{Conception et choix techniques}
 La logique métier est directe : Grafana expose une \gls{api} HTTP permettant de
 \textbf{lister} les tableaux de bord et les sources de données d'une instance,
 puis d'y \textbf{créer} de nouveaux objets. L'outil interroge l'instance source,
@@ -49,45 +50,31 @@ deux instances (appariées par nom), puis parcourt chaque tableau de bord pour y
 
 L'enjeu de conception portait surtout sur l'\textbf{interface}. Plutôt qu'une
 ligne de commande aride, l'outil a été doté d'une \textbf{interface en mode texte}
-(\gls{tui}) à l'aide du framework Python \textbf{Textual}. Ce framework a été une
+(\gls{tui}) à l'aide du framework Python \textbf{Textual}~\cite{textual-doc}. Ce framework a été une
 \textbf{découverte marquante} : il permet de décrire une interface terminal selon
-un modèle très proche du développement web — une structure de composants
+un modèle très proche du développement web, avec une structure de composants
 apparentée au \emph{HTML}, mise en forme par des feuilles de style apparentées au
 \emph{CSS}. On obtient ainsi, dans un simple terminal, une interface interactive
 (listes, sélection des instances, validation de l'appariement) sans quitter
 l'environnement de travail des administrateurs.
 
-\section{Réalisation}
+\subsection{Réalisation}
 % TODO : remplacer par un extrait réel du dépôt (illustratif, pas le code entier).
 Le cœur de l'outil tient dans la réécriture des identifiants : à partir de la
 table de correspondance construite entre les deux instances, chaque référence à
 une source de données présente dans un tableau de bord est substituée par son
 équivalent côté cible.
 
-\begin{lstlisting}[language=Python,caption={Réécriture des identifiants de sources de données lors de la duplication (extrait illustratif).},label={lst:t1}]
-# correspondance : datasource de l'instance source -> datasource de la cible,
-# appariées par leur nom (ex. "prometheus-valo" présent sur les deux instances)
-correspondance = apparier_par_nom(sources_origine, sources_cible)
-
-def reecrire(dashboard):
-    # on substitue chaque identifiant de datasource par son équivalent cible ;
-    # un dashboard copié sans cette étape pointerait vers des IDs inexistants
-    for panel in dashboard["panels"]:
-        ancien = panel["datasource"]["uid"]
-        panel["datasource"]["uid"] = correspondance[ancien]
-    return dashboard
-\end{lstlisting}
-
-\section{Difficultés rencontrées}
+\subsection{Difficultés rencontrées}
 S'agissant de ma \textbf{première tâche} dans l'équipe, l'enjeu principal n'était
-pas tant la complexité — le besoin était circonscrit et la mission relativement
-\textbf{rapide} — que la \textbf{prise en main} de l'environnement : le mode de
+pas tant la complexité, le besoin étant circonscrit et la mission relativement
+\textbf{rapide}, que la \textbf{prise en main} de l'environnement : le mode de
 travail de l'équipe, le dépôt, et la reprise d'un \gls{poc} déjà entamé par un
 tiers. La principale subtilité technique tenait à la \textbf{robustesse de
 l'appariement} des sources de données, l'appariement par nom supposant une
 nomenclature cohérente d'une instance à l'autre.
 
-\section{Résultats et bénéfice business}
+\subsection{Résultats et bénéfice business}
 % TODO (auteur) : si disponible, chiffrer le gain (durée de la procédure
 %        manuelle avant / exécution de l'outil après).
 L'outil a transformé une synchronisation manuelle et faillible en une opération
@@ -95,7 +82,7 @@ L'outil a transformé une synchronisation manuelle et faillible en une opératio
 copier puis corriger chaque tableau de bord à la main, la duplication complète
 d'une instance se réduit désormais à l'exécution de l'outil. La classe
 d'erreurs liée aux identifiants de sources de données mal réécrits disparaît
-purement et simplement — et avec elle les tableaux de bord silencieusement
+purement et simplement, et avec elle les tableaux de bord silencieusement
 cassés sur les instances secondaires, c'est-à-dire des angles morts de
 supervision sur un logiciel critique.
 

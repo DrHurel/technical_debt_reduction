@@ -11,11 +11,11 @@
 \section{Définition et métaphore}
 La notion de dette technique naît d'une métaphore financière due à Ward
 Cunningham~\cite{cunningham1992} : livrer rapidement un code imparfait
-revient à contracter un emprunt. L'emprunt n'est pas condamnable en soi — il
+revient à contracter un emprunt. L'emprunt n'est pas condamnable en soi : il
 permet d'aller plus vite, de saisir une opportunité de marché, d'apprendre du
 réel avant de raffiner. Mais comme tout emprunt, il se décompose en un
-\textbf{principal} — l'écart entre le code tel qu'il est et le code tel qu'il
-devrait être — et des \textbf{intérêts} : le surcoût payé à chaque
+\textbf{principal}, c'est-à-dire l'écart entre le code tel qu'il est et le
+code tel qu'il devrait être, et des \textbf{intérêts} : le surcoût payé à chaque
 intervention ultérieure tant que le principal n'est pas remboursé. Un code
 mal structuré ne coûte rien tant qu'on n'y touche pas ; il coûte à chaque
 modification, et ce coût croît avec le temps. Le « remboursement » porte un
@@ -28,7 +28,7 @@ deux axes~\cite{fowler2009} : la dette peut être \textbf{délibérée} ou
 \textbf{accidentelle}, et \textbf{prudente} ou \textbf{imprudente}. Une
 équipe qui choisit consciemment une solution rapide pour tenir une échéance,
 en sachant ce qu'elle devra rembourser, contracte une dette délibérée et
-prudente — un outil de pilotage légitime. La dette dangereuse est celle qui
+prudente, qui constitue un outil de pilotage légitime. La dette dangereuse est celle qui
 s'accumule à l'insu de tous : accidentelle, par méconnaissance des bonnes
 pratiques, ou imprudente, par renoncement permanent à tout remboursement.
 Les contextes rencontrés durant cette alternance relèvent pour l'essentiel
@@ -44,30 +44,30 @@ dans ce mémoire en recoupent cinq formes principales.
   \item[Dette de code.] La plus visible : fonctions interminables, abus de
   directives de préprocesseur, constructions trahissant une maîtrise
   approximative du langage. C'est l'état du firmware de la BBox chez Beemo
-  (chapitre~\ref{chap:t7}).
-  \item[Dette de test.] L'absence de filet de sécurité automatisé — tests
+  (section~\ref{chap:t7}).
+  \item[Dette de test.] L'absence de filet de sécurité automatisé : tests
   unitaires, d'intégration, de non-régression. C'est la forme dominante
   rencontrée chez Free Mobile, et la cible directe des
-  chapitres~\ref{chap:t3} à~\ref{chap:t5}.
+  sections~\ref{chap:t3} à~\ref{chap:t5}.
   \item[Dette d'architecture.] Des choix structurels qui freinent toute
   évolution : le couplage massif induit par un en-tête incluant tout le
-  projet (chapitre~\ref{chap:t7}), ou la multiplication de \gls{fork}
+  projet (section~\ref{chap:t7}), ou la multiplication de \gls{fork}
   divergents là où un socle commun aurait dû être maintenu
-  (chapitre~\ref{chap:t5}).
+  (section~\ref{chap:t5}).
   \item[Dette de documentation et de connaissance.] Le savoir-faire qui ne
   réside que dans la tête d'une personne : la procédure de compilation de
   l'agent VSX ne survivait que par son unique détenteur
-  (chapitre~\ref{chap:t6}), et une partie des sources du moteur de
+  (section~\ref{chap:t6}), et une partie des sources du moteur de
   valorisation n'était pas même versionnée.
   \item[Dette de build et de dépendances.] Une chaîne de production opaque,
   non reproductible ou devenue insoutenable : la saturation mémoire de la
-  compilation parallèle (chapitre~\ref{chap:t2}) et le \emph{build} distant,
-  manuel et non documenté de l'agent VSX (chapitre~\ref{chap:t6}).
+  compilation parallèle (section~\ref{chap:t2}) et le \emph{build} distant,
+  manuel et non documenté de l'agent VSX (section~\ref{chap:t6}).
 \end{description}
 
 Cette typologie éclaire un point de méthode : la dette de test et la dette de
 connaissance sont les plus sournoises, car elles ne se manifestent par aucun
-symptôme dans le code lui-même — elles ne se révèlent qu'au moment où l'on
+symptôme dans le code lui-même : elles ne se révèlent qu'au moment où l'on
 modifie le logiciel, ou au départ d'un collaborateur.
 
 \section{Enjeux business}
@@ -91,8 +91,8 @@ maintenance du legacy et nouveaux développements.
 
 La dette technique se pose donc rarement comme un problème purement technique :
 elle relève d'un arbitrage permanent entre le temps consacré à la production de
-valeur immédiate — le \emph{time-to-market} des fonctionnalités attendues par le
-marché — et celui investi dans la soutenabilité du logiciel à long terme : coût
+valeur immédiate (le \emph{time-to-market} des fonctionnalités attendues par le
+marché) et celui investi dans la soutenabilité du logiciel à long terme : coût
 de maintenance, risque de régression et fiabilité, cette dernière pesant tout
 particulièrement pour un opérateur télécom. La littérature souligne d'ailleurs
 que la dette réellement \emph{mesurée} dans le code excède fréquemment celle que
@@ -110,7 +110,7 @@ manière empirique, comme le détaille le retour d'expérience qui suit.
 
 Au-delà des leviers strictement techniques, les deux entreprises où j'ai
 exercé montrent que la manière d'adresser la dette dépend autant de l'état de
-la base de code que de contraintes économiques — et humaines. Cette section
+la base de code que de contraintes économiques, mais aussi humaines. Cette section
 revient sur ce que j'ai pu observer dans chacun de ces contextes.
 
 \subsection{Une même logique d'adressage incrémental}
@@ -131,8 +131,8 @@ Chez Free Mobile, la dette tenait surtout à la multiplication de \emph{forks}
 dotés de spécificités, vraisemblablement créés faute de temps pour produire de
 nouvelles versions. Le code restait toutefois globalement compréhensible et
 logique, malgré certains choix architecturaux discutables et une méconnaissance
-de quelques outils externes — par exemple le recours à des requêtes SQL là où
-des mécanismes plus adaptés existaient.
+de quelques outils externes : on y recourait par exemple à des requêtes SQL là
+où des mécanismes plus adaptés existaient.
 
 Chez Beemo, les contraintes de réécriture étaient bien plus fortes. Le code y
 est plus cloisonné et, paradoxalement, plus lisible, mais aussi beaucoup plus
@@ -158,44 +158,45 @@ ajouts au sein d'un existant déjà complexe, n'a rien de particulièrement
 attrayant.
 
 Ce constat n'est pas anecdotique : pour qu'une dette technique soit
-correctement résorbée, l'enjeu humain — motivation des équipes et reconnaissance
-d'un travail ingrat — me paraît, au regard de ces deux années d'alternance, tout
+correctement résorbée, l'enjeu humain, c'est-à-dire la motivation des équipes
+et la reconnaissance d'un travail ingrat, me paraît, au regard de ces deux années d'alternance, tout
 aussi déterminant que les choix d'outillage ou d'architecture.
 
 \section{Leviers de réduction}
 Face à ces différentes formes de dette, la littérature et la pratique
-convergent vers un petit nombre de leviers complémentaires — chacun étant
+convergent vers un petit nombre de leviers complémentaires, chacun étant
 actionné par au moins une des missions présentées dans la suite.
 
 Le premier levier est le \textbf{test automatisé}. Michael Feathers définit
 d'ailleurs le code \emph{legacy} non par son âge, mais par l'absence de
 tests~\cite{feathers2004} : sans filet de non-régression, toute modification
 est un pari, et la peur de casser fige le logiciel dans son état. Doter un
-code existant de tests est donc le préalable à tout remboursement de dette —
+code existant de tests est donc le préalable à tout remboursement de dette ;
 c'est l'objet même du framework de test et de son portage vers les forks
-legacy (chapitres~\ref{chap:t3} et~\ref{chap:t5}).
+legacy (sections~\ref{chap:t3} et~\ref{chap:t5}).
 
 Le deuxième est le \textbf{refactoring}, c'est-à-dire l'amélioration de la
 structure du code à comportement constant~\cite{fowler2018}. Il suppose le
 premier levier : on ne réécrit sereinement que ce que l'on peut re-tester.
-Lorsque le refactoring frontal est trop risqué, des stratégies d'isolation —
-construire du code moderne à côté du legacy, derrière une frontière nette —
-permettent d'avancer sans tout reprendre (chapitre~\ref{chap:t7}).
+Lorsque le refactoring frontal est trop risqué, des stratégies d'isolation,
+consistant à construire du code moderne à côté du legacy derrière une
+frontière nette, permettent d'avancer sans tout reprendre
+(section~\ref{chap:t7}).
 
 Le troisième est l'\textbf{automatisation de la chaîne de livraison} :
 intégration et déploiement continus~\cite{humble2010}, mais aussi, plus en
 amont, une chaîne de compilation soutenable et reproductible. Un \emph{build}
-qui échoue par saturation mémoire (chapitre~\ref{chap:t2}) ou qui ne
+qui échoue par saturation mémoire (section~\ref{chap:t2}) ou qui ne
 fonctionne que sur une machine distante non documentée
-(chapitre~\ref{chap:t6}) constitue un goulot d'étranglement qui renchérit
+(section~\ref{chap:t6}) constitue un goulot d'étranglement qui renchérit
 chaque livraison.
 
 Le dernier levier, transversal, est l'\textbf{outillage et la capitalisation
 de la connaissance} : automatiser les procédures manuelles
-(chapitre~\ref{chap:t1}), versionner ce qui ne l'était pas, documenter sous
-forme exécutable — un patch versionné vaut mieux qu'une procédure orale — et
+(section~\ref{chap:t1}), versionner ce qui ne l'était pas, documenter sous
+forme exécutable (un patch versionné vaut mieux qu'une procédure orale) et
 abaisser la barrière d'entrée des outils de qualité pour qu'ils soient
-réellement adoptés (chapitre~\ref{chap:t4}). Ce levier répond directement à
+réellement adoptés (section~\ref{chap:t4}). Ce levier répond directement à
 la dette de connaissance, la plus exposée au départ des personnes.
 
 \section{Grille de lecture des missions}
@@ -215,11 +216,10 @@ de tests et qui rend, plus largement, le développement de nouvelles
 fonctionnalités difficile. Chacune des tâches qui suivent peut ainsi se lire
 comme une réponse à une facette de ce constat.
 
-Les chapitres suivants présentent ces missions regroupées par nature, selon
-les leviers qu'elles actionnent : \textbf{outiller la qualité et la
-non-régression} (chapitres~\ref{chap:t1} à~\ref{chap:t5}), \textbf{maîtriser
-la chaîne de production logicielle} (chapitres~\ref{chap:t2}
-et~\ref{chap:t6}), puis \textbf{développer une fonctionnalité dans un
-existant endetté} (chapitre~\ref{chap:t7}). La chronologie exacte de ces
-travaux est restituée par le diagramme de Gantt en
-annexe~\ref{chap:annexes}.
+Les trois chapitres suivants présentent ces missions regroupées par nature,
+selon les leviers qu'elles actionnent : \textbf{outiller la productivité et
+standardiser l'environnement de développement}
+(chapitre~\ref{chap:outils}), \textbf{rendre testable un logiciel legacy}
+pour résorber les régressions et s'en prémunir
+(chapitre~\ref{chap:testabilite}), puis \textbf{développer du code à visée
+de production dans un existant endetté} (chapitre~\ref{chap:production}).

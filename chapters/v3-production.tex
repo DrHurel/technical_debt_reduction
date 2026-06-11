@@ -1,0 +1,26 @@
+\chapter{Développer du code à visée de production dans un existant endetté}
+\label{chap:production}
+% Chapitre-chapeau du volet 3 : fonctionnalité d'immuabilité (t7).
+
+Ce dernier chapitre, consacré à une mission menée chez Beemo, change de
+posture : il ne s'agit plus
+d'outiller ou de tester l'existant, mais d'\textbf{écrire du code neuf
+destiné à la production} au cœur d'un firmware massivement endetté : fichiers
+de plusieurs dizaines de milliers de lignes, couplage généralisé, absence de
+tests (chapitre~\ref{chap:veille}).
+
+L'enjeu est de livrer la fonctionnalité \textbf{sans accroître la dette}, et
+la difficulté est double. Technique, d'abord : chaque point de contact avec
+le legacy importe son opacité et son couplage ; du code neuf écrit « dans le
+style » de l'existant en hérite mécaniquement, et l'absence de filet de test
+rend toute intégration risquée. Méthodologique, ensuite : l'existant exerce
+une pression de conformité, car le chemin de moindre effort consiste à imiter
+ce qui est déjà là, donc à reproduire les pratiques qui ont créé la dette.
+S'en prémunir suppose une discipline d'\textbf{isolation} : écrire le neuf
+de manière testable et découplée, et confiner le dialogue avec le legacy dans
+une couche d'adaptation explicite, plutôt que de laisser les deux mondes
+s'entremêler.
+
+La section~\ref{chap:t7} illustre cette démarche avec le développement d'une
+fonctionnalité d'immuabilité des sauvegardes, dont l'architecture trace une
+voie de modernisation progressive du firmware.

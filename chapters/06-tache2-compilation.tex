@@ -1,6 +1,7 @@
-\chapter{Maîtrise du coût de compilation du Valo Engine}
+\section{Maîtrise du coût de compilation du Valo Engine}
 \label{chap:t2}
-% Entreprise : Free Mobile — Volet « maîtriser la chaîne de production » (1/2)
+% Entreprise : Free Mobile — Chapitre « outils : productivité et
+% standardisation de l'environnement » (section 2/3)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -12,7 +13,7 @@
 %  6. Résultats & bénéfice business (réduction de la dette)
 % =====================================================================
 
-\section{Contexte et dette technique initiale}
+\subsection{Contexte et dette technique initiale}
 Le \emph{Valo Engine} est écrit en \textbf{C++}, langage dont la compilation est
 réputée \textbf{coûteuse}, en temps de calcul comme en mémoire. Cette lourdeur
 tient à son modèle historique de compilation, hérité du C : chaque fichier source
@@ -23,26 +24,36 @@ en-têtes, ils sont \textbf{réinstanciés à chaque unité de traduction} qui l
 inclut. Une même instanciation est ainsi recompilée des dizaines de fois à
 travers le projet.
 
+À strictement parler, ce coût ne devient un problème que parce que l'on
+cherche à compiler \textbf{en parallèle} : une compilation séquentielle
+resterait sobre en mémoire, mais à un prix prohibitif en temps. Or y
+renoncer n'est pas une option : développer en C++, c'est s'appuyer sur le
+compilateur pour se prémunir d'un maximum d'erreurs \emph{avant même}
+d'exécuter le programme, et la rapidité du \emph{build} conditionne donc
+toute la boucle de développement (lancer les tests unitaires, valider une
+modification), avec les gains de temps évoqués en introduction de ce
+chapitre.
+
 Le pic se produit à l'\textbf{édition des liens}. L'éditeur de liens doit y
 rassembler tous les fichiers objets et \textbf{dédupliquer} les définitions
 redondantes d'une même fonction ou instanciation, issues des multiples unités de
-traduction — une étape dont l'empreinte mémoire explose à mesure que le nombre de
+traduction ; l'empreinte mémoire de cette étape explose à mesure que le nombre de
 symboles croît. En lançant une compilation parallèle exploitant l'ensemble des
-cœurs d'une machine — de l'ordre de \textbf{24} —, la \gls{toolchain} \textbf{saturait
+cœurs d'une machine, de l'ordre de \textbf{24}, la \gls{toolchain} \textbf{saturait
 la RAM} précisément à cette phase de liaison, rendant la compilation instable
 voire impossible à mener à son terme. La dette était ici nichée dans la
 \textbf{chaîne de compilation} elle-même : un atout de productivité (le
 parallélisme) se retournait en obstacle.
 
-\section{Objectif de la mission}
+\subsection{Objectif de la mission}
 La mission consistait à étudier la \textbf{faisabilité d'un compromis} : exploiter
 au mieux les cœurs disponibles \emph{sans} provoquer la saturation mémoire qui
 faisait échouer la compilation. Autrement dit, \textbf{ordonnancer} la
-compilation pour qu'elle reste \textbf{soutenable} en mémoire — en particulier
-durant l'édition des liens — tout en conservant un parallélisme aussi élevé que
+compilation pour qu'elle reste \textbf{soutenable} en mémoire, en particulier
+durant l'édition des liens, tout en conservant un parallélisme aussi élevé que
 le permet le budget RAM de la machine.
 
-\section{Conception et choix techniques}
+\subsection{Conception et choix techniques}
 Le diagnostic a d'abord consisté à \textbf{isoler la phase critique}. La
 compilation des unités de traduction se parallélise sans difficulté majeure ;
 c'est l'\textbf{édition des liens}, beaucoup plus gourmande en mémoire par
@@ -55,8 +66,8 @@ la machine.
 
 % TODO : préciser le mécanisme retenu (pool de tâches de l'outil de build,
 %        limitation dédiée à l'étape de link, choix de l'éditeur de liens, etc.).
-À plus long terme, la \textbf{cause racine} — la recompilation répétée des
-en-têtes et des templates — trouve une réponse dans les \textbf{modules} de
+À plus long terme, la \textbf{cause racine}, à savoir la recompilation répétée
+des en-têtes et des templates, trouve une réponse dans les \textbf{modules} de
 \textbf{C++20}, qui compilent une interface \textbf{une seule fois} au lieu de la
 réanalyser à chaque inclusion. Cette voie n'était toutefois pas exploitable :
 \textbf{le support des modules reste partiel} dans les compilateurs. À titre de
@@ -68,50 +79,38 @@ n'est pas encore une option standard et mûre.
 %   compilateur le plus avancé sur l'environnement de PRODUCTION ciblé (la valeur
 %   ci-dessus a été constatée localement sur g++ 13.3 / Ubuntu 24.04).
 
-\section{Réalisation}
-% TODO : remplacer par l'extrait réel (configuration de build / script
-%        d'ordonnancement). Illustratif ci-dessous.
+\subsection{Réalisation}
+% TODO (auteur) : insérer l'extrait réel (configuration de build / script
+%        d'ordonnancement) si disponible.
 L'idée se matérialise en \textbf{limitant la concurrence de l'étape de liaison}
 indépendamment de celle de la compilation, de sorte que le pic mémoire cumulé
 des éditions de liens reste sous le plafond de la machine.
 
-\begin{lstlisting}[language=bash,caption={Borner le parallélisme de l'édition des liens pour contenir le pic mémoire (extrait illustratif).},label={lst:t2}]
-# Compilation : on exploite tous les cœurs disponibles (étape peu coûteuse en RAM)
-NB_COEURS=$(nproc)                     # ex. 24 cœurs
-
-# Édition des liens : étape qui fait exploser la RAM -> on borne sa concurrence
-# pour que le pic mémoire cumulé reste sous la capacité de la machine
-LINK_PARALLELE=4                       # déterminé d'après la RAM par link
-
-compiler   --jobs "$NB_COEURS"
-lier       --jobs "$LINK_PARALLELE"    # le goulot d'étranglement est ici, pas avant
-\end{lstlisting}
-
-\section{Difficultés rencontrées}
+\subsection{Difficultés rencontrées}
 La principale difficulté a été de \textbf{caractériser le pic mémoire} : la
 saturation ne survenait qu'à l'édition des liens et seulement sous forte
-concurrence, ce qui en rendait l'observation peu intuitive — le coût n'est pas
+concurrence, ce qui en rendait l'observation peu intuitive : le coût n'est pas
 réparti uniformément sur la durée de la compilation, mais \textbf{concentré} sur
 sa phase finale. La seconde tenait à la \textbf{tension entre vitesse et
 mémoire} : tout plafonnement de la concurrence de liaison améliore la stabilité
 au prix d'un allongement du temps de compilation, et le bon réglage dépend
 étroitement du couple (mémoire disponible, taille des objets à lier).
 
-\section{Résultats et bénéfice business}
+\subsection{Résultats et bénéfice business}
 % TODO : quantifier (compilation menée à terme sans crash, temps obtenu vs
 %        configuration naïve). Relier au thème dette technique (chap.~\ref{chap:veille}).
 En bornant la concurrence de la phase de liaison, la compilation redevient
 \textbf{soutenable} sur les machines de développement : elle peut être menée à
 son terme sans saturer la RAM, là où une parallélisation naïve la faisait
-échouer — le tout en conservant un parallélisme maximal sur la phase de
+échouer, tout en conservant un parallélisme maximal sur la phase de
 compilation proprement dite, qui représente l'essentiel de la durée totale.
 Pour l'équipe, le bénéfice est direct : un \emph{build} fiable est la
 condition de toute boucle de développement courte, et donc de toute
 intervention sereine sur le code.
 
 Au-delà du résultat immédiat, cette mission a été l'occasion de
-\textbf{mettre au jour une dette de fond} — le coût du modèle de compilation C++
-préalable aux modules —, dont la résorption complète reste suspendue à la
+\textbf{mettre au jour une dette de fond}, le coût du modèle de compilation C++
+préalable aux modules, dont la résorption complète reste suspendue à la
 maturation du support de C++20/23 dans les compilateurs.
 % TODO (auteur) : si disponible, chiffrer le temps de compilation obtenu et
 %        le seuil de concurrence retenu pour l'édition des liens.

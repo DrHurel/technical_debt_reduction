@@ -87,7 +87,7 @@
 % ---------- Liens hypertextes (à charger en dernier) -----------------
 \usepackage[hidelinks]{hyperref}
 \hypersetup{
-  pdftitle={Mémoire d'alternance — Réduction de la dette technique},
+  pdftitle={Mémoire d'alternance : réduction de la dette technique},
   pdfauthor={Jérémy Hurel}
 }
 
@@ -123,17 +123,20 @@
 \input{chapters/03-env-technique}
 \input{chapters/04-veille-dette-technique}
 
-% --- Travaux effectués : tâches regroupées par NATURE (cf. INSTRUCTION),
-%     la chronologie exacte étant donnée par le Gantt en annexe. ---------
-% Volet 1 — Outiller la qualité : supervision et non-régression
+% --- Travaux effectués : un chapitre thématique par volet, une section
+%     par tâche.
+% Chapitre — Outils : productivité et standardisation de l'environnement
+\input{chapters/v1-outils}
 \input{chapters/05-tache1-grafana}
+\input{chapters/06-tache2-compilation}
+\input{chapters/10-tache6-retroengineering}
+% Chapitre — Testabilité d'un logiciel legacy
+\input{chapters/v2-testabilite}
 \input{chapters/07-tache3-framework}
 \input{chapters/08-tache4-extensions-vscode}
 \input{chapters/09-tache5-portage}
-% Volet 2 — Maîtriser la chaîne de production logicielle
-\input{chapters/06-tache2-compilation}
-\input{chapters/10-tache6-retroengineering}
-% Volet 3 — Développer dans un existant endetté
+% Chapitre — Code à visée de production dans un existant endetté
+\input{chapters/v3-production}
 \input{chapters/11-tache7-feature}
 
 \input{chapters/12-conclusion}

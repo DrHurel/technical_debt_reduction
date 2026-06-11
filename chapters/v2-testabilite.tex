@@ -1,0 +1,31 @@
+\chapter{Rendre testable un logiciel legacy : résorber les régressions et s'en prémunir}
+\label{chap:testabilite}
+% Chapitre-chapeau du volet 2 : framework (t3), extension VS Code (t4), portage (t5).
+
+Ce deuxième chapitre nous ramène chez Free Mobile et rassemble les trois
+missions consacrées à la \textbf{testabilité} du \emph{Valo Engine} et de ses
+forks. Il répond à la forme de dette dominante identifiée au
+chapitre~\ref{chap:veille} : la \textbf{dette de test}, c'est-à-dire
+l'absence de filet de sécurité automatisé autour d'un logiciel pourtant
+critique pour la facturation : le \emph{Valo Engine} calcule le coût de
+chaque appel, et une régression ou une panne sur ce maillon peut engendrer
+des pertes \textbf{de l'ordre du million d'euros en une semaine}.
+
+L'importance des tests dans un contexte legacy dépasse la seule détection
+d'anomalies. Sans filet de non-régression, chaque modification (correctif,
+évolution, et à plus forte raison refactoring) est un pari : la seule
+validation possible est manuelle, donc partielle, coûteuse et non rejouable.
+Les régressions se découvrent alors en production, là où leur coût est
+maximal. Surtout, la dette de test verrouille toutes les autres : on ne peut
+résorber une dette de code ou d'architecture qu'en modifiant le logiciel, ce
+que l'on ne s'autorise pas sans filet. Rendre un logiciel legacy testable est
+donc le \textbf{prérequis de tout remboursement} : c'est l'investissement qui
+rend les autres possibles.
+
+Encore faut-il que ce filet soit fiable et adopté. Les trois missions de ce
+chapitre s'enchaînent dans cette logique : concevoir un framework de test
+d'intégration et de non-régression à scénarios déclaratifs
+(section~\ref{chap:t3}), lever les freins à son adoption par l'équipe grâce à
+une extension VS~Code dédiée (section~\ref{chap:t4}), puis étendre ce filet
+aux six forks legacy du moteur par un portage de l'architecture du framework
+(section~\ref{chap:t5}).

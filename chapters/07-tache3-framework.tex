@@ -1,6 +1,6 @@
-\chapter{Un framework de test d'intégration et de non-régression}
+\section{Un framework de test d'intégration et de non-régression}
 \label{chap:t3}
-% Entreprise : Free Mobile — Volet « outiller la qualité » (2/4)
+% Entreprise : Free Mobile — Chapitre « testabilité d'un logiciel legacy » (section 1/3)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -12,7 +12,7 @@
 %  6. Résultats & bénéfice business (réduction de la dette)
 % =====================================================================
 
-\section{Contexte et dette technique initiale}
+\subsection{Contexte et dette technique initiale}
 % TODO : avant ton arrivée, comment la non-régression était-elle gérée ?
 % (tests manuels ? absence de filet de sécurité ? régressions récurrentes ?)
 % Quantifier si possible le « coût » de cette dette.
@@ -24,23 +24,23 @@ y introduire de la logique : un test pouvait dès lors échouer non à cause d'u
 régression du logiciel testé, mais à cause d'un défaut du test lui-même. La
 frontière entre code de test et code testé devenait floue, ce qui fragilisait la
 confiance accordée à ce filet de sécurité. À cela s'ajoutait un couplage de bas
-niveau : le protocole de communication du moteur — un protocole TCP décrit en C
-— était embarqué dans le Lua, ce qui rendait la suite délicate à maintenir.
+niveau : le protocole de communication du moteur, un protocole TCP décrit en C,
+était embarqué dans le Lua, ce qui rendait la suite délicate à maintenir.
 
-\section{Objectif de la mission}
+\subsection{Objectif de la mission}
 % TODO : concevoir un framework de tests d'intégration / non-régression /
 % fonctionnels pour le programme initial.
 L'objectif était de remplacer cette suite Lua par un framework dédié, reposant
 sur des scénarios \textbf{déclaratifs}, volontairement plus contraignants. En
-restreignant fortement la forme des tests — un scénario décrit \emph{quoi}
-vérifier, jamais \emph{comment} —, on garantit que l'échec d'un test, dès lors
+restreignant fortement la forme des tests (un scénario décrit \emph{quoi}
+vérifier, jamais \emph{comment}), on garantit que l'échec d'un test, dès lors
 que le framework se trouve dans une version stable, provient bien du code du
 logiciel testé et non de la mécanique de test. Le nouveau framework devait au
 minimum couvrir le périmètre fonctionnel déjà assuré par le Lua : la simulation
 des trames d'appel (appels voix, envoi de SMS et de MMS, consommation de data)
 ainsi que la vérification des données ainsi produites.
 
-\section{Conception et choix techniques}
+\subsection{Conception et choix techniques}
 % TODO : architecture du framework (runner, fixtures, jeux de données,
 % rapports), langage/outils retenus et pourquoi, intégration au pipeline.
 
@@ -53,9 +53,9 @@ celui du moteur sans recourir au langage natif.
 
 Le framework prend en entrée des scénarios de test rédigés en YAML. Ces
 scénarios sont analysés par un \textbf{parseur SAX}, qui présente deux
-avantages : il permet de récupérer la position (ligne) de chaque instruction
-— information transmise au débogueur pour offrir une exécution \emph{pas à
-pas} — et il interrompt l'analyse dès la première erreur de syntaxe en
+avantages : il permet de récupérer la position (ligne) de chaque instruction,
+qui est transmise au débogueur pour offrir une exécution \emph{pas à
+pas}, et il interrompt l'analyse dès la première erreur de syntaxe en
 indiquant sa localisation et sa nature (arguments mal formés ou instruction
 non supportée).
 
@@ -67,8 +67,8 @@ instancie la commande correspondante à partir d'un \emph{registry} où sont
 enregistrées toutes les commandes supportées.
 
 Autour de cette boucle, le framework fournit les services nécessaires pour
-\textbf{moquer} les briques avec lesquelles le logiciel testé — le
-\emph{Valo Engine} — interagit : un service simulant les équipements qui
+\textbf{moquer} les briques avec lesquelles le logiciel testé, le
+\emph{Valo Engine}, interagit : un service simulant les équipements qui
 interrogent le moteur (autorisation d'appel ou de SMS, vérification du crédit
 selon la localisation) et un service recevant les notifications de seuil
 émises par le moteur (courriels et messages). Enfin, un ensemble
@@ -79,9 +79,9 @@ Le mécanisme de vérification reprend le principe de \emph{snapshot} déjà emp
 côté Lua : les actions jouées ainsi que l'état final de la base de données sont
 sérialisés, puis comparés à une trace de référence enregistrée lors d'une
 exécution validée ; toute divergence signale une régression. Pour disposer
-d'emblée d'une restitution des résultats exploitable — comptes rendus,
-agrégation des échecs, comparable à celle d'une suite de tests classique — le
-framework a été bâti comme une \textbf{surcouche de Pytest}, la génération et la
+d'emblée d'une restitution des résultats exploitable (comptes rendus,
+agrégation des échecs, comparable à celle d'une suite de tests classique), le
+framework a été bâti comme une \textbf{surcouche de Pytest}~\cite{pytest-doc}, la génération et la
 comparaison des snapshots étant déléguées à la bibliothèque \textbf{syrupy}.
 
 \begin{figure}[H]\centering
@@ -89,40 +89,24 @@ comparaison des snapshots étant déléguées à la bibliothèque \textbf{syrupy
   \caption{Architecture du framework de test.}\label{fig:archi-t3}
 \end{figure}
 
-\section{Réalisation}
+\subsection{Réalisation}
 Du point de vue du rédacteur de test, tout tient dans le scénario YAML :
 une suite d'instructions déclaratives, jouées séquentiellement, qui décrivent
-un flux d'appel et les vérifications attendues. L'extrait ci-dessous illustre
-la forme générale d'un scénario.
-
-\begin{lstlisting}[caption={Scénario de test déclaratif : un appel voix et sa vérification (extrait illustratif).},label={lst:t3-scenario}]
-# Chaque ligne est une instruction du langage de test : le scenario
-# decrit QUOI verifier, jamais COMMENT (aucune logique possible).
-- declarer_abonne:   # prepare un abonne de test avec un solde connu
-    msisdn: "33600000001"
-    solde: 10.0
-
-- appel_voix:        # simule les trames TCP d'un appel de 2 minutes
-    appelant: "33600000001"
-    duree: 120
-
-- verifier_valorisation:   # l'etat produit (solde, tickets en base)
-    msisdn: "33600000001"  # est serialise puis compare au snapshot
-                           # de reference valide par l'equipe
-\end{lstlisting}
+un flux d'appel et les vérifications attendues.
+% TODO (auteur) : insérer ici un extrait réel de scénario YAML du dépôt.
 
 Côté framework, chaque nom d'instruction est résolu via le \emph{registry}
 des commandes : la \emph{factory} instancie l'objet \emph{Command}
-correspondant, qui encapsule l'envoi des trames TCP au \emph{Valo Engine} —
+correspondant, qui encapsule l'envoi des trames TCP au \emph{Valo Engine},
 reconstituées en Python grâce aux structures \texttt{ctypes} équivalentes aux
 structures C du protocole. Les instructions de vérification, elles, ne
 contiennent aucune assertion explicite : elles sérialisent l'état observé
 (actions jouées, contenu de la base), que syrupy compare au \emph{snapshot}
 de référence. Un test échoue donc pour une raison et une seule : l'état
-produit par le moteur a divergé de l'état validé — c'est-à-dire une
+produit par le moteur a divergé de l'état validé, c'est-à-dire une
 régression.
 
-\section{Difficultés rencontrées}
+\subsection{Difficultés rencontrées}
 S'agissant de l'une des premières missions d'envergure qui m'étaient confiées,
 la principale difficulté a tenu au \textbf{découpage du travail}. Plutôt que de
 procéder par versions intermédiaires, livrables et vérifiables au fur et à
@@ -133,16 +117,16 @@ contrôle qu'un découpage plus fin aurait offerts.
 
 Le second point, apparu avec le recul, concerne le choix de bâtir le framework
 sur Pytest. Si cet outil fournit gratuitement un socle d'exécution et de
-reporting éprouvé, il recèle aussi de nombreux mécanismes implicites — sa
-« \emph{black magic} » — dont le comportement peut se révéler déroutant et
+reporting éprouvé, il recèle aussi de nombreux mécanismes implicites, sa
+« \emph{black magic} », dont le comportement peut se révéler déroutant et
 compliquer le développement d'une surcouche.
 
-\section{Résultats et bénéfice business}
+\subsection{Résultats et bénéfice business}
 % TODO (auteur) : si disponible, chiffrer (nombre de scénarios, régressions
 % détectées avant mise en production).
 Le framework a remplacé la suite Lua sur l'ensemble de son périmètre
-fonctionnel — appels voix, SMS, MMS, consommation de data et vérification des
-données produites — en éliminant sa fragilité structurelle : les scénarios
+fonctionnel (appels voix, SMS, MMS, consommation de data et vérification des
+données produites), tout en éliminant sa fragilité structurelle : les scénarios
 étant purement déclaratifs, l'échec d'un test signale désormais une
 régression du moteur, et non un défaut du test. C'est toute la valeur du
 filet de sécurité qui s'en trouve restaurée : l'équipe peut faire confiance
@@ -153,8 +137,8 @@ Au regard du fil rouge (chapitre~\ref{chap:veille}), cette mission actionne
 le levier central identifié par Feathers~\cite{feathers2004} : doter un code
 legacy de tests pour rendre possible toute intervention ultérieure. Le
 framework est, de fait, devenu une infrastructure : il a servi de socle à
-l'extension VS~Code (chapitre~\ref{chap:t4}) puis au portage vers les forks
-legacy (chapitre~\ref{chap:t5}), où il a fait du filet de non-régression un
+l'extension VS~Code (section~\ref{chap:t4}) puis au portage vers les forks
+legacy (section~\ref{chap:t5}), où il a fait du filet de non-régression un
 préalable aux correctifs de stabilisation. Représentant à terme de l'ordre de
 30~000 lignes de code, il constitue la réalisation la plus structurante de
 mon passage chez Free Mobile.

@@ -1,43 +1,45 @@
-\chapter{Rétro-ingénierie pour la compilation avec un SDK}
+\section{Rétro-ingénierie pour la compilation avec un SDK}
 \label{chap:t6}
-% Entreprise : Beemo Technologie — Volet « maîtriser la chaîne de production » (2/2)
+% Entreprise : Beemo Technologie — Chapitre « outils : productivité et
+% standardisation de l'environnement » (section 3/3)
 
-\section{Contexte et dette technique initiale}
+\subsection{Contexte et dette technique initiale}
 % TODO : un programme doit être compilé avec un \gls{sdk} donné, mais la
 % compilation échoue / n'est pas documentée. C'est un cas typique de dette
 % (build cassé, savoir perdu, dépendance opaque). Enjeu business : sans
 % build, pas de livraison.
-Cette tâche est sensiblement plus \textbf{courte} que celles menées chez Free
-Mobile, mais elle n'en est pas moins \textbf{déterminante} dans la démarche de
-réduction de la dette technique. Elle porte sur l'un des logiciels de Beemo,
+Première mission menée chez \textbf{Beemo Technologie} (présentée au
+chapitre~\ref{chap:entreprises}), cette tâche est sensiblement plus
+\textbf{courte} que les précédentes, mais n'en est pas moins
+\textbf{déterminante} : elle porte sur l'un des logiciels de Beemo,
 \textbf{l'agent VSX}, et vise à reprendre le contrôle sur une partie de sa
 \textbf{chaîne de production}. Sa portée dépasse le simple correctif : il s'agit
 d'\textbf{automatiser} et d'\textbf{harmoniser} la méthode de fabrication de cet
-agent — ce qui la rend, à mes yeux, aussi structurante que la réalisation du
+agent, ce qui la rend, à mes yeux, aussi structurante que la réalisation du
 framework de test étalée sur près d'un an et demi.
 
 Avant cette mission, mettre à jour l'agent VSX supposait une manipulation
 manuelle et fragile : on \textbf{poussait la base de code vers une machine
-distante}, sur laquelle elle était compilée avec le \textbf{DSDK} — le
+distante}, sur laquelle elle était compilée avec le \textbf{DSDK}, le
 \gls{sdk} fourni par Broadcom pour la réalisation de \emph{daemons} (processus
-d'arrière-plan) —, avant de pouvoir être testée.
+d'arrière-plan), avant de pouvoir être testée.
 
 La dette technique est apparue avec le \textbf{passage à la version~8 du DSDK},
 nécessaire pour supporter la version~8 de l'agent. Dans sa configuration de
 base, le DSDK impose le flag de compilation C++ \texttt{-Wall -Werror}, qui
 \textbf{convertit l'ensemble des avertissements en erreurs} bloquantes. Or
 l'agent est écrit en C++11, avec une \textbf{absence quasi totale de bonnes
-pratiques} de génie logiciel — certains fichiers dépassent les
+pratiques} de génie logiciel : certains fichiers dépassent les
 \textbf{50~000~lignes}. Le volume d'avertissements produit est dès lors
 \textbf{colossal} et intraitable en l'état : il met un frein considérable à la
 capacité de l'équipe à \textbf{livrer des mises à jour en continu}.
 
-Une rustine existait bien — des modifications appliquées directement sur la
-machine de compilation pour neutraliser ce comportement — mais elle n'était
+Une rustine existait bien (des modifications appliquées directement sur la
+machine de compilation pour neutraliser ce comportement), mais elle n'était
 \textbf{ni reproductible ni documentée}. Ce savoir reposait sur le développeur
 \textbf{que je remplace} : son départ menaçait de l'emporter avec lui.
 
-\section{Objectif de la mission}
+\subsection{Objectif de la mission}
 % TODO : rendre la compilation fonctionnelle avec le \gls{sdk}, ce qui a
 % nécessité une démarche de \gls{retro-ingenierie}.
 La mission a poursuivi deux objectifs complémentaires :
@@ -51,10 +53,11 @@ La mission a poursuivi deux objectifs complémentaires :
         l'image.
 \end{itemize}
 Atteindre ces deux objectifs supposait au préalable de \textbf{comprendre le
-fonctionnement interne du DSDK} — une démarche de \gls{retro-ingenierie}, le
-SDK n'exposant aucun moyen standard d'agir sur ses flags de compilation.
+fonctionnement interne du DSDK} : une démarche de \gls{retro-ingenierie}
+s'imposait, le SDK n'exposant aucun moyen standard d'agir sur ses flags de
+compilation.
 
-\section{Démarche de rétro-ingénierie}
+\subsection{Démarche de rétro-ingénierie}
 % TODO : c'est le cœur de cette tâche — détailler la méthode :
 % - analyse des artefacts (binaires, symboles, \gls{abi}/\gls{api}, headers)
 % - reconstitution de la \gls{toolchain} / des dépendances manquantes
@@ -75,33 +78,17 @@ chaîne. Une fois ce point localisé, la suite s'est révélée nettement plus
 simple : il a suffi de cibler les fichiers concernés et d'en dériver des
 correctifs reproductibles.
 
-\section{Réalisation}
+\subsection{Réalisation}
 % TODO : extrait de configuration de build / commande / patch ayant
 % débloqué la compilation (commenté).
 La solution repose sur un \textbf{Dockerfile} qui reconstitue l'environnement de
 compilation auparavant confiné à la machine distante, puis applique les
 correctifs du SDK de façon déterministe. Chaque modification est isolée dans un
 fichier \texttt{.patch} versionné et appliquée via la commande \texttt{patch}
-lors de la construction de l'image — là où elle était jusqu'alors saisie à la
+lors de la construction de l'image, là où elle était jusqu'alors saisie à la
 main, sans trace.
 
-\begin{lstlisting}[language=bash,caption={Reconstitution de la toolchain et application reproductible des correctifs du DSDK dans le Dockerfile (extrait illustratif).},label={lst:t4}]
-# Image de compilation embarquant la toolchain Broadcom (DSDK v8),
-# auparavant disponible uniquement sur une machine distante.
-FROM broadcom/dsdk:8
-
-# Application reproductible des correctifs du SDK : chaque .patch est
-# versionne et documente, en lieu et place des modifications manuelles
-# faites jusqu'ici directement sur la machine de compilation.
-COPY patches/ /tmp/patches/
-RUN patch -p1 -d "${DSDK_ROOT}" < /tmp/patches/0001-assouplir-werror.patch
-
-# Le build de l'agent VSX devient ainsi local et rejouable a l'identique.
-WORKDIR /src
-RUN make agent-vsx
-\end{lstlisting}
-
-\section{Difficultés rencontrées}
+\subsection{Difficultés rencontrées}
 % TODO : absence de doc, incompatibilités de versions, opacité du SDK.
 La principale difficulté a tenu à l'\textbf{opacité du DSDK} et à
 l'identification du point d'injection des patchs, évoquée plus haut. Une seconde
@@ -111,7 +98,7 @@ qui n'est plus accepté en l'état. C'est la raison pour laquelle la tâche
 demeure \textbf{encore en cours} : le \emph{build} local et reproductible est
 acquis, mais la \textbf{validation du package} reste à fiabiliser.
 
-\section{Résultats et bénéfice business}
+\subsection{Résultats et bénéfice business}
 % TODO : build reproductible et documenté = dette résorbée, déblocage du
 % produit, capitalisation du savoir pour l'équipe.
 La mission a transformé une \textbf{procédure manuelle, distante et non
@@ -123,7 +110,7 @@ de la dette. En supprimant le frein imposé par \texttt{-Wall -Werror}, l'équip
 retrouve sa capacité à \textbf{livrer des mises à jour de l'agent VSX en
 continu}.
 
-Le chantier restant — résoudre l'impact sur la certification — s'inscrit dans
+Le chantier restant, à savoir résoudre l'impact sur la certification, s'inscrit dans
 une perspective plus large : \textbf{automatiser le processus de validation d'un
 package par Broadcom}, aujourd'hui \textbf{très chronophage}. À terme, c'est
 l'ensemble de la chaîne de production de l'agent qui gagnerait en

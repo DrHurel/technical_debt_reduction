@@ -1,0 +1,35 @@
+\chapter{Outiller la productivité et standardiser l'environnement de développement}
+\label{chap:outils}
+% Chapitre-chapeau du volet 1 : Grafana (t1), compilation (t2), DSDK (t6).
+
+Ce premier chapitre regroupe trois missions qui partagent une même nature :
+construire ou reprendre en main l'\textbf{outillage} qui conditionne le
+travail quotidien des développeurs. Relues à travers la typologie du
+chapitre~\ref{chap:veille}, elles s'attaquent principalement à la
+\textbf{dette de build et de dépendances} et à la \textbf{dette de
+connaissance} : des procédures manuelles, non reproductibles ou détenues par
+une seule personne, qui renchérissent chaque intervention sur le logiciel.
+
+L'intérêt de \textbf{standardiser l'environnement de développement} est
+double. C'est d'abord un enjeu de \textbf{productivité} : tout ce qu'un
+développeur doit refaire à la main (répliquer une configuration de
+supervision, subir une compilation qui sature sa machine, pousser le code
+vers une machine distante pour le construire) est un coût payé à chaque
+itération, par chaque membre de l'équipe ; l'outiller, c'est le payer une
+fois. Ce coût se chiffre : à l'échelle d'une journée de développeur, qui
+recompile et redéploie des dizaines de fois, une à deux minutes gagnées par
+cycle se comptent presque en \textbf{heures} récupérées, soit du temps passé à
+produire plutôt qu'à attendre. C'est ensuite un enjeu de \textbf{capitalisation} : un environnement
+standardisé transforme un savoir-faire individuel en savoir
+\emph{exécutable} (outil, configuration versionnée, image de conteneur) qui
+survit au départ des personnes, là où la procédure manuelle disparaît avec
+son détenteur. Enfin, un socle commun à toute l'équipe supprime les écarts
+entre postes (« ça compile chez moi ») qui transforment chaque anomalie en
+enquête.
+
+Trois missions actionnent ce levier : un outil de duplication de la
+configuration Grafana (section~\ref{chap:t1}) et la maîtrise du coût de
+compilation du \emph{Valo Engine} (section~\ref{chap:t2}), toutes deux chez
+Free Mobile, puis, chez Beemo, la rétro-ingénierie du DSDK pour rendre le
+\emph{build} de l'agent VSX local, reproductible et documenté
+(section~\ref{chap:t6}).

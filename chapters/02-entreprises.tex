@@ -24,20 +24,20 @@ passés en téléphonie mobile sur les différents réseaux.
 À mon arrivée, ce logiciel se trouvait dans un contexte de dette technique
 élevée : l'ingénieur qui en assurait la maintenance avait quitté
 l'entreprise, et plusieurs règles de génie logiciel n'avaient pas été
-respectées — une partie des sources n'étant par exemple pas versionnée sous
-Git. L'équipe, montée et dirigée par David Desmarest, s'est vu confier une
+respectées : une partie des sources, par exemple, n'était pas versionnée
+sous Git. L'équipe, montée et dirigée par David Desmarest, s'est vu confier une
 mission de reprise de contrôle de ce logiciel.
 
 Mon rôle y était transverse au travail de l'équipe de développement :
 supporter celle-ci en produisant des outils internes, au premier rang
-desquels le framework de test détaillé au chapitre~\ref{chap:t3}.
+desquels le framework de test détaillé à la section~\ref{chap:t3}.
 
 \section{Beemo Technologie}
 Beemo Technologie est une entreprise d'une vingtaine d'années spécialisée
 dans la sauvegarde de données. Sa particularité est de ne pas se limiter à
 un logiciel installé sur une machine du client, mais de proposer une
 solution clé en main : des boîtiers (\emph{box}) déployés au sein de
-l'entreprise — voire chez son dirigeant — qui assurent la sauvegarde et la
+l'entreprise, voire chez son dirigeant, qui assurent la sauvegarde et la
 duplication des données, et donc leur redondance en cas de perte.
 
 L'entreprise compte une trentaine d'employés et dispose de clients et de
@@ -52,37 +52,38 @@ Desmarest, qui, après avoir quitté Free Mobile, en avait pris la direction.
 À la différence de Free Mobile, où mon rôle était transverse et orienté support,
 j'occupais ici un poste de développeur travaillant directement sur le
 fonctionnel. Le contexte restait toutefois marqué par la dette technique :
-l'enjeu était de demeurer productif face au marché — c'est-à-dire de
-continuer à livrer de nouvelles fonctionnalités — tout en résorbant
+l'enjeu était de demeurer productif face au marché, c'est-à-dire de
+continuer à livrer de nouvelles fonctionnalités, tout en résorbant
 progressivement cette dette.
 
 \section{Positionnement des missions}
 Sept missions jalonnent ces deux années : cinq chez Free Mobile, deux chez
-Beemo Technologie — ces dernières étant encore en cours au moment de la
-rédaction. Plutôt que de les présenter dans l'ordre chronologique — restitué
-par le diagramme de Gantt en annexe~\ref{chap:annexes} —, ce mémoire les
-regroupe par nature, en trois volets : \textbf{outiller la qualité et la
-non-régression}, \textbf{maîtriser la chaîne de production logicielle}, et
-\textbf{développer une fonctionnalité dans un existant endetté}. Le
-tableau~\ref{tab:missions} en donne la vue d'ensemble.
+Beemo Technologie, ces dernières étant encore en cours au moment de la
+rédaction. Plutôt que de les présenter dans l'ordre chronologique, restitué
+par le diagramme de Gantt en annexe~\ref{chap:annexes}, ce mémoire les
+regroupe par nature, en trois chapitres thématiques : \textbf{outiller la productivité et
+standardiser l'environnement de développement}, \textbf{rendre testable un
+logiciel legacy} pour résorber les régressions et s'en prémunir, et
+\textbf{développer du code à visée de production dans un existant endetté}.
+Le tableau~\ref{tab:missions} en donne la vue d'ensemble.
 
 \begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{@{}l l X@{}}
 \toprule
-\textbf{Volet / Entreprise} & \textbf{Mission} & \textbf{Objectif au regard de la dette technique} \\
+\textbf{Thème / Entreprise} & \textbf{Mission} & \textbf{Objectif au regard de la dette technique} \\
 \midrule
-\multicolumn{3}{@{}l}{\emph{Outiller la qualité et la non-régression}} \\
+\multicolumn{3}{@{}l}{\emph{Outils : productivité et standardisation de l'environnement de développement}} \\
 Free Mobile & Duplication Grafana & Fiabiliser la réplication de la supervision \\
-Free Mobile & Framework de test & Industrialiser la non-régression \\
-Free Mobile & Extension VS Code & Améliorer la productivité des développeurs \\
-Free Mobile & Portage multi-forks & Mutualiser la qualité sur les variantes \\
-\midrule
-\multicolumn{3}{@{}l}{\emph{Maîtriser la chaîne de production logicielle}} \\
 Free Mobile & Compilation C++ & Maîtriser le coût de compilation (CPU/RAM) \\
 Beemo      & Rétro-ing. SDK    & Débloquer et documenter une compilation existante \\
 \midrule
-\multicolumn{3}{@{}l}{\emph{Développer dans un existant endetté}} \\
+\multicolumn{3}{@{}l}{\emph{Testabilité d'un logiciel legacy}} \\
+Free Mobile & Framework de test & Industrialiser la non-régression \\
+Free Mobile & Extension VS Code & Ouvrir l'usage du framework à toute l'équipe \\
+Free Mobile & Portage multi-forks & Mutualiser la qualité sur les variantes \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Code à visée de production dans un existant endetté}} \\
 Beemo      & Immuabilité       & Livrer une fonctionnalité sans accroître la dette \\
 \bottomrule
 \end{tabularx}

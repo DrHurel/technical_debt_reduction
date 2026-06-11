@@ -46,8 +46,8 @@ d'autres équipes. Le monitoring s'appuie sur Prometheus, qui permet de
 collecter des métriques directement sur les différents logiciels en
 exploitation.
 
-Le stockage des \gls{cdr} — les données générées par les équipements
-téléphoniques, terme standard du domaine des télécoms — repose sur une base
+Le stockage des \gls{cdr} (les données générées par les équipements
+téléphoniques, selon le terme standard du domaine des télécoms) repose sur une base
 NoSQL, Cassandra. Cette dernière présentant toutefois certaines limitations,
 ClickHouse a été introduit en complément : il s'agit d'une base de données
 relationnelle orientée colonne, qui offre d'excellentes performances sur les
@@ -61,10 +61,10 @@ environnement Linux avec la \gls{toolchain} GNU (\texttt{g++}), pilotée par
 des \emph{makefiles}. Cette chaîne, en apparence banale, joue un rôle central
 dans deux des missions présentées : chez Free Mobile, la taille de la base de
 code rend la compilation parallèle si gourmande en ressources qu'elle devient
-elle-même un sujet d'ingénierie (chapitre~\ref{chap:t2}) ; chez Beemo, la
+elle-même un sujet d'ingénierie (section~\ref{chap:t2}) ; chez Beemo, la
 compilation de l'agent VSX dépend d'un \gls{sdk} propriétaire fourni par
 Broadcom, le DSDK, qui impose sa propre chaîne et ses propres réglages
-(chapitre~\ref{chap:t6}).
+(section~\ref{chap:t6}).
 
 \textbf{Docker} complète cet outillage : il permet d'encapsuler une chaîne de
 compilation complète dans une image reproductible, et a servi chez Beemo à
@@ -79,11 +79,11 @@ intégrées par \emph{merge requests} soumises à revue de code. Ce
 fonctionnement, aujourd'hui standard, prend ici un relief particulier : chez
 Free Mobile, une partie des sources du logiciel de valorisation n'était
 \emph{pas} versionnée à l'arrivée de l'équipe, et certains binaires en
-production ne correspondaient plus à aucune source identifiée — un exemple
-typique de dette dont la résorption conditionne tout le reste.
+production ne correspondaient plus à aucune source identifiée. Il s'agit là
+d'un exemple typique de dette dont la résorption conditionne tout le reste.
 
-L'\gls{ci} s'inscrit dans la même logique : les suites de tests — dont le
-framework présenté au chapitre~\ref{chap:t3} — ont vocation à être exécutées
+L'\gls{ci} s'inscrit dans la même logique : les suites de tests, dont le
+framework présenté à la section~\ref{chap:t3}, ont vocation à être exécutées
 automatiquement à chaque modification, de façon à détecter les régressions
 avant la mise en production plutôt qu'après.
 
@@ -97,8 +97,8 @@ de trois semaines, tandis que la partie \gls{api} et interface web, dont les
 besoins différaient, suivait des cycles plus courts de deux semaines.
 
 Le rituel central était le point quotidien d'une quinzaine de minutes, tenu en
-début de journée — autour de huit heures quarante-cinq, selon les heures
-d'arrivée de chacun — avant le début effectif de la journée de travail. Ce
+début de journée, autour de huit heures quarante-cinq selon les heures
+d'arrivée de chacun, avant le début effectif de la journée de travail. Ce
 rendez-vous court permettait à chaque membre de l'équipe de partager son
 avancement et d'identifier rapidement les éventuels points de blocage.
 
@@ -115,7 +115,7 @@ Chez Beemo Technologie, l'organisation repose également sur une méthode
 des étapes du processus. Le point quotidien s'y tient à onze heures
 quarante-cinq, et s'y ajoute une phase de raffinement (\emph{refinement})
 au cours de laquelle les tickets sont précisés avant le démarrage de leur
-développement — une pratique qui n'était pas spécifiquement mise en œuvre chez
+développement. Cette pratique n'était pas spécifiquement mise en œuvre chez
 Free Mobile, où l'on se montrait plus flexible sur ce point. Chaque fin de
 sprint, d'une durée de deux à trois semaines, donne par ailleurs lieu à une
 rétrospective.

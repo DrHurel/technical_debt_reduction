@@ -10,36 +10,43 @@
 \section{Bilan fonctionnel}
 Au moment de la rédaction de ce mémoire, l'alternance n'est pas achevée :
 les missions menées chez Beemo Technologie sont encore en cours. Le bilan
-qui suit photographie donc l'état des travaux à la date de la soutenance.
+qui suit photographie donc l'état des travaux à la date de la soutenance,
+en reprenant les trois volets thématiques qui structurent ce mémoire.
 
-Côté Free Mobile, les cinq missions ont été menées à leur terme et livrées.
-L'outil de duplication Grafana (chapitre~\ref{chap:t1}) est exploité pour
-synchroniser les instances de supervision. Le framework de test
-(chapitre~\ref{chap:t3}) a remplacé la suite Lua sur l'ensemble de son
-périmètre et constitue désormais le filet de non-régression du \emph{Valo
-Engine} ; l'extension VS~Code (chapitre~\ref{chap:t4}) l'accompagne et en a
-ouvert l'usage à toute l'équipe. Le portage vers les forks legacy
-(chapitre~\ref{chap:t5}) a couvert les six variantes visées — France B2C et
-B2B, Caraïbes, Italie B2C et B2B, proxy italien — et a été l'occasion d'une
-transmission de connaissances en binôme avant mon départ. Enfin, l'étude sur
-le coût de compilation (chapitre~\ref{chap:t2}) a rendu le \emph{build}
-soutenable sur les machines de développement, tout en documentant la dette de
-fond que seuls les modules C++20 résorberont à terme.
+Sur le volet de l'\textbf{outillage et de la standardisation de
+l'environnement de développement} (chapitre~\ref{chap:outils}), l'outil de
+duplication Grafana (section~\ref{chap:t1}) est livré et exploité pour
+synchroniser les instances de supervision. L'étude sur le coût de
+compilation (section~\ref{chap:t2}) a rendu le \emph{build} du \emph{Valo
+Engine} soutenable sur les machines de développement, tout en documentant la
+dette de fond que seuls les modules C++20 résorberont à terme. La
+rétro-ingénierie du DSDK (section~\ref{chap:t6}) a atteint son objectif
+principal, un \emph{build} local, reproductible et versionné, mais reste
+ouverte sur la validation du package affecté par l'un des correctifs.
 
-Côté Beemo, la rétro-ingénierie du DSDK (chapitre~\ref{chap:t6}) a atteint
-son objectif principal — un \emph{build} local, reproductible et versionné —
-mais reste ouverte sur la validation du package affecté par l'un des
-correctifs. La fonctionnalité d'immuabilité (chapitre~\ref{chap:t7}) est en
-cours de développement : ses briques centrales — automate à états, service de
-chiffrement, couche d'adaptation au firmware — sont en place, le code neuf
-étant écrit de manière testable et isolée, à rebours des pratiques du
-firmware qui l'accueille.
+Sur le volet de la \textbf{testabilité du logiciel legacy}
+(chapitre~\ref{chap:testabilite}), les trois missions ont été menées à leur
+terme et livrées. Le framework de test (section~\ref{chap:t3}) a remplacé la
+suite Lua sur l'ensemble de son périmètre et constitue désormais le filet de
+non-régression du \emph{Valo Engine} ; l'extension VS~Code
+(section~\ref{chap:t4}) l'accompagne et en a ouvert l'usage à toute
+l'équipe ; le portage vers les forks legacy (section~\ref{chap:t5}) a
+couvert les six variantes visées (France B2C et B2B, Caraïbes, Italie B2C et
+B2B, proxy italien) et a été l'occasion d'une transmission de connaissances
+en binôme avant mon départ.
+
+Sur le volet du \textbf{code à visée de production dans un existant
+endetté} (chapitre~\ref{chap:production}), la fonctionnalité d'immuabilité
+(section~\ref{chap:t7}) est en cours de développement : ses briques
+centrales (automate à états, service de chiffrement, couche d'adaptation au
+firmware) sont en place, le code neuf étant écrit de manière testable et
+isolée, à rebours des pratiques du firmware qui l'accueille.
 
 \section{Retour sur le fil rouge : la dette technique}
 Relues à travers la grille du chapitre~\ref{chap:veille}, ces sept missions
 dessinent une conclusion d'ensemble : la dette technique ne se rembourse pas
 par un grand soir, mais par une accumulation d'actions ciblées, chacune
-actionnant un levier précis — outiller, tester, fiabiliser la chaîne de
+actionnant un levier précis : outiller, tester, fiabiliser la chaîne de
 production, isoler le neuf de l'ancien. Dans les deux entreprises, la
 stratégie gagnante a été \emph{incrémentale} : préserver la capacité à livrer
 tout en réduisant, intervention après intervention, le risque et le coût des
@@ -47,14 +54,14 @@ suivantes.
 
 J'en retiens aussi deux enseignements moins attendus. Le premier est que la
 forme de dette la plus dangereuse n'est pas dans le code : c'est la dette de
-connaissance, celle qui part avec les personnes — le framework de test après
-le départ de David, la procédure de compilation de l'agent VSX que je suis
-venu reprendre. Sa parade est la capitalisation sous forme exécutable :
+connaissance, celle qui part avec les personnes, comme le framework de test
+après le départ de David ou la procédure de compilation de l'agent VSX que je
+suis venu reprendre. Sa parade est la capitalisation sous forme exécutable :
 tests, patchs versionnés, outillage. Le second est la dimension humaine du
 remboursement : un travail de fond sur du legacy est ingrat, et la motivation
 des équipes en est un facteur limitant au même titre que la technique. Les
 outils d'\gls{ia-agentique}, expérimentés en fin de parcours
-(chapitre~\ref{chap:t5}), ne changent pas cette équation : ils récompensent
+(section~\ref{chap:t5}), ne changent pas cette équation : ils récompensent
 la maîtrise de l'architecture et du métier, mais ne s'y substituent pas.
 
 \section{Apports de l'alternance}
@@ -68,13 +75,13 @@ que les technologies elles-mêmes, j'en retire une compétence transversale :
 savoir aborder un système existant, opaque et non documenté, et en reprendre
 le contrôle méthodiquement.
 
-Sur le plan organisationnel et humain, travailler dans deux entreprises —
-un grand opérateur et une PME d'une trentaine de personnes — m'a donné deux
+Sur le plan organisationnel et humain, travailler dans deux entreprises,
+un grand opérateur et une PME d'une trentaine de personnes, m'a donné deux
 points de comparaison sur la méthode agile, la gestion d'une équipe face au
 legacy, et la place qu'un développeur peut y occuper : transverse et hors
 sprint chez Free Mobile, pleinement intégré aux livraisons chez Beemo. Le
-portage en binôme m'a par ailleurs placé en situation de \emph{transmettre} —
-exercice qui force à expliciter ce que l'on croyait évident. Enfin, sur le
+portage en binôme m'a par ailleurs placé en situation de \emph{transmettre},
+un exercice qui force à expliciter ce que l'on croyait évident. Enfin, sur le
 plan personnel, la décision de quitter Free Mobile pour suivre une nouvelle
 opportunité m'a appris à arbitrer un choix de carrière, et la confiance
 accordée sur des missions structurantes a confirmé mon goût pour
@@ -87,8 +94,8 @@ des forks legacy vers un socle commun, le filet de non-régression rendant
 désormais cette migration envisageable ; la résorption de la dette de
 compilation passera, elle, par l'adoption des modules C++20 lorsque les
 chaînes de compilation l'autoriseront. Chez Beemo, la suite est double :
-fiabiliser la validation des packages auprès de Broadcom — puis l'automatiser,
-pour achever l'harmonisation de la chaîne de production de l'agent VSX — et
+fiabiliser la validation des packages auprès de Broadcom, puis l'automatiser
+pour achever l'harmonisation de la chaîne de production de l'agent VSX, et
 mener à son terme la fonctionnalité d'immuabilité. À plus long terme, la
 couche d'adaptation qui l'héberge ouvre une voie de modernisation progressive
 du firmware : écrire chaque évolution en C++ moderne et testable, et « gommer »

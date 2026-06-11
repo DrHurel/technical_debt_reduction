@@ -1,6 +1,6 @@
-\chapter{Outillage du framework : une extension VS Code (LSP et débogueur)}
+\section{Outillage du framework : une extension VS Code (LSP et débogueur)}
 \label{chap:t4}
-% Entreprise : Free Mobile — Volet « outiller la qualité » (3/4)
+% Entreprise : Free Mobile — Chapitre « testabilité d'un logiciel legacy » (section 2/3)
 
 % =====================================================================
 %  Trame conseillée (réutilisée pour chaque tâche) :
@@ -12,34 +12,34 @@
 %  6. Résultats & bénéfice business (réduction de la dette)
 % =====================================================================
 
-\section{Contexte et dette technique initiale}
-Une fois le framework de test livré (chapitre~\ref{chap:t3}), un nouveau
+\subsection{Contexte et dette technique initiale}
+Une fois le framework de test livré (section~\ref{chap:t3}), un nouveau
 frein est apparu : la rédaction des tests elle-même. Les scénarios sont décrits
 en YAML, support sur lequel l'écriture ne bénéficie d'aucune assistance
 contextuelle. Là où des langages comme Python, Lua ou C++ disposent d'un serveur
 de langage (\gls{lsp}) offrant autocomplétion et analyse syntaxique au fil de la
 frappe, le YAML n'est outillé que pour la validation de schémas. Il ne propose
-pas d'assistance qui tienne compte du contexte — capable, par exemple, de savoir
+pas d'assistance qui tienne compte du contexte, c'est-à-dire capable de savoir
 si l'on est en train de saisir une instruction ou l'un de ses arguments.
 
 Or le format de test n'est pas un simple document de configuration : c'est en
 réalité un langage à part entière, bâti au-dessus du YAML. On y manipule des
-\textbf{instructions} — équivalentes à des fonctions —, des \textbf{constantes}
+\textbf{instructions} (équivalentes à des fonctions), des \textbf{constantes}
 ainsi que des \textbf{variables} qui constituent les arguments passés à ces
 instructions. Faute d'outillage tenant compte de cette grammaire, les erreurs de
 syntaxe n'étaient découvertes qu'à l'exécution et aucun moyen n'existait
 d'observer pas à pas le déroulé d'un scénario. Cette friction freinait l'adoption
 du framework par l'équipe : une dette « d'outillage ».
 
-\section{Objectif de la mission}
+\subsection{Objectif de la mission}
 La mission a consisté à développer une extension \emph{Visual Studio Code},
-écrite en \textbf{TypeScript}, au service du framework du
-chapitre~\ref{chap:t3}. Cette
+écrite en \textbf{TypeScript}, au service du framework de la
+section~\ref{chap:t3}. Cette
 extension réunit deux facettes complémentaires :
 \begin{itemize}
   \item un \textbf{serveur de langage} (\gls{lsp}) apportant autocomplétion,
         diagnostics en temps réel et aide à la saisie. En s'appuyant sur la
-        grammaire du format de test — instructions, constantes et variables —,
+        grammaire du format de test (instructions, constantes et variables),
         il fournit une assistance \emph{contextuelle} : il sait distinguer
         l'endroit où l'on attend une instruction de celui où l'on saisit un
         argument, et propose les complétions correspondantes ;
@@ -56,7 +56,7 @@ le \emph{Valo Engine} en \textbf{mode débogage} et de progresser pas à pas
 (\emph{call flow}) étape par étape. Le diagnostic ne se limite ainsi plus au
 test, mais descend jusqu'au code natif du logiciel sous test.
 
-\section{Conception et choix techniques}
+\subsection{Conception et choix techniques}
 % TODO : un SCHÉMA d'architecture serait le bienvenu :
 % \begin{figure}[H]\centering
 %   \includegraphics[width=0.85\textwidth]{archi-extensions-vscode.png}
@@ -66,65 +66,38 @@ test, mais descend jusqu'au code natif du logiciel sous test.
 Le choix du \gls{lsp} répond à un principe de \textbf{découplage} entre l'éditeur
 et le langage : la logique d'analyse et de complétion est portée par un serveur
 indépendant, réutilisable au-delà de VS Code par tout éditeur compatible. Le
-serveur exploite la grammaire du format de test — celle-là même qu'analyse le
-parseur du framework (chapitre~\ref{chap:t3}) — pour produire des complétions et
+serveur exploite la grammaire du format de test, celle-là même qu'analyse le
+parseur du framework (section~\ref{chap:t3}), pour produire des complétions et
 des diagnostics cohérents avec ce que le framework acceptera réellement à
 l'exécution.
 
 Le débogueur, lui, repose sur le \textbf{Debug Adapter Protocol} (\gls{dap}),
 protocole standardisé par VS Code pour piloter une session de débogage au moyen
 d'échanges \emph{JSON-RPC}. Côté framework, son intégration s'appuie sur un
-module qui contrôle le flot d'exécution du test — mise en pause, reprise,
-progression pas à pas — tout en remontant à l'éditeur les données nécessaires au
+module qui contrôle le flot d'exécution du test (mise en pause, reprise,
+progression pas à pas), tout en remontant à l'éditeur les données nécessaires au
 diagnostic.
 
 Les seules données internes au framework de test ne suffisent toutefois pas à
 diagnostiquer l'ensemble des problèmes : il faut aussi connaître l'état interne
-du moteur. Un \textbf{service} dédié — développé par David — a donc été mis en
+du moteur. Un \textbf{service} dédié, développé par David, a donc été mis en
 place pour exposer l'état des variables internes du \emph{Valo Engine}.
 L'extension dialogue avec ce service via \textbf{HTTP} et restitue ces valeurs
 directement dans l'\gls{ide}, aux côtés de l'état du test.
 
-\section{Réalisation}
-% TODO : remplacer les extraits ci-dessous par des extraits réels du dépôt.
-%        Ils sont fournis à titre ILLUSTRATIF (pas le code entier).
+\subsection{Réalisation}
+% TODO (auteur) : insérer des extraits réels du dépôt (pas le code entier).
 Côté \gls{lsp}, le serveur s'abonne aux requêtes de complétion émises par
 l'éditeur. À partir de la position du curseur, il détermine le contexte
-grammatical courant et renvoie la liste des propositions adaptées — instructions
-disponibles ou variables déjà déclarées.
-
-\begin{lstlisting}[language=Java,caption={Fourniture d'autocomplétion contextuelle via le LSP (extrait illustratif, TypeScript).},label={lst:t4-lsp}]
-// Déclenché par l'éditeur à chaque demande de complétion
-connection.onCompletion((params) => {
-  // On déduit le contexte grammatical à partir de la position du curseur
-  const contexte = analyserContexte(document, params.position);
-
-  // Selon que l'on attend une instruction ou un argument,
-  // on ne propose pas le même jeu de complétions
-  return contexte === "instruction"
-    ? instructionsSupportees()   // liste tirée du registry du framework
-    : variablesDeclarees(document);
-});
-\end{lstlisting}
+grammatical courant et renvoie la liste des propositions adaptées :
+instructions disponibles ou variables déjà déclarées.
 
 Côté débogueur, l'adaptateur \gls{dap} traduit les ordres de l'éditeur (poser un
 point d'arrêt, exécuter l'instruction suivante) en commandes pilotant le flot
-d'exécution du test, puis renvoie l'état courant — instruction en cours, état du
+d'exécution du test, puis renvoie l'état courant : instruction en cours, état du
 \emph{Valo Engine} obtenu via le service HTTP.
 
-\begin{lstlisting}[language=Java,caption={Pas à pas : pose des points d'arrêt côté adaptateur de débogage (extrait illustratif, TypeScript).},label={lst:t4-dap}]
-// Requête DAP : l'éditeur transmet les lignes où s'arrêter
-protocol.onSetBreakpoints((args) => {
-  // Les lignes proviennent du parseur du framework,
-  // qui associe chaque instruction à sa position dans le YAML
-  moteurDeTest.armerPointsArret(args.lines);
-
-  // On confirme à l'éditeur les points d'arrêt effectivement posés
-  return { breakpoints: args.lines.map(verifierLigne) };
-});
-\end{lstlisting}
-
-\section{Difficultés rencontrées}
+\subsection{Difficultés rencontrées}
 La première difficulté a tenu à la \textbf{documentation de l'API d'extension de
 VS Code}. Si des exemples d'extensions existent, l'\gls{api} elle-même reste
 inégalement documentée, et aucun standard ne s'impose réellement quant à la
@@ -134,27 +107,27 @@ et a imposé un travail d'expérimentation pour aboutir à une organisation
 maintenable.
 
 La seconde difficulté a porté sur l'\textbf{intégration du \gls{dap}} au
-framework de test. Il a fallu adapter le protocole — fondé sur des échanges
-\emph{JSON-RPC} — à un module capable de contrôler le flot d'exécution d'un test
+framework de test. Il a fallu adapter le protocole, fondé sur des échanges
+\emph{JSON-RPC}, à un module capable de contrôler le flot d'exécution d'un test
 tout en remontant les données utiles au diagnostic. La restitution de l'état
 interne du moteur, obtenue par un service HTTP distinct, a par ailleurs supposé
 de coordonner deux canaux de communication (\gls{dap} et HTTP) au sein d'une même
 session de débogage.
 
-\section{Résultats et bénéfice business}
+\subsection{Résultats et bénéfice business}
 % TODO (auteur) : si disponible, chiffrer (temps d'écriture d'un test,
 %        nombre d'utilisateurs dans l'équipe).
 L'extension a déplacé la détection des erreurs \textbf{en amont de
 l'exécution} : les fautes de syntaxe et les instructions inconnues sont
 signalées au fil de la frappe, et l'autocomplétion contextuelle guide le
-rédacteur dans la grammaire du format de test — là où il fallait auparavant
+rédacteur dans la grammaire du format de test, là où il fallait auparavant
 lancer le scénario pour découvrir la moindre coquille. L'écriture d'un test
 cesse ainsi d'être réservée à qui connaît le framework par cœur.
 
 Le débogueur transforme, lui, le diagnostic des échecs : au lieu de déduire
 la cause d'une régression à partir du seul compte rendu final, on rejoue le
 scénario pas à pas en observant l'état du \emph{Valo Engine} à chaque
-instruction — jusqu'à descendre, si besoin, dans son code C++. Ce confort
+instruction, jusqu'à descendre, si besoin, dans son code C++. Ce confort
 n'est pas accessoire : un outil de qualité n'a d'effet sur la dette que s'il
 est \emph{adopté}, et c'est précisément cette barrière d'entrée que
 l'extension abaisse (chapitre~\ref{chap:veille}). Elle convertit le framework

@@ -1,22 +1,22 @@
-\chapter{Portage du framework vers les forks legacy du Valo Engine}
+\section{Portage du framework vers les forks legacy du Valo Engine}
 \label{chap:t5}
-% Entreprise : Free Mobile — Volet « outiller la qualité » (4/4)
+% Entreprise : Free Mobile — Chapitre « testabilité d'un logiciel legacy » (section 3/3)
 
-\section{Contexte et dette technique initiale}
+\subsection{Contexte et dette technique initiale}
 % TODO : pourquoi plusieurs \gls{fork} du programme initial existent-ils ?
 % Quelle dette cela crée-t-il (duplication de tests, divergence, double
 % maintenance) ? C'est le « problème business » à résoudre.
-Le framework de test (chapitre~\ref{chap:t3}) avait été conçu pour le
+Le framework de test (section~\ref{chap:t3}) avait été conçu pour le
 \emph{Valo Engine} du \textbf{réseau prépayé} de Free Mobile, un réseau alors
 nouveau. Une fois ce dernier mis en production et jugé \textbf{stable}, la
-stratégie de gestion de la dette technique a été révisée — une inflexion qui a
+stratégie de gestion de la dette technique a été révisée, une inflexion qui a
 coïncidé avec le départ de David.
 
 La stratégie initiale faisait du prépayé le socle d'une \textbf{base de code
 commune et moderne}, destinée à être réutilisée par les moteurs de valorisation
 des différents réseaux : on aurait ainsi migré progressivement chaque réseau
 vers cette version moderne. Elle a cédé la place à une approche de \textbf{quick
-fix} — que l'on pourrait presque qualifier de \emph{quick converting} —, visant
+fix} (que l'on pourrait presque qualifier de \emph{quick converting}), visant
 à \textbf{stabiliser au maximum} les réseaux existants sans en moderniser le
 code ; la modernisation n'interviendrait, le cas échéant, qu'une fois cette
 stabilisation acquise.
@@ -25,14 +25,12 @@ Or ces réseaux reposent sur autant de \gls{fork} \emph{legacy} du moteur, chacu
 doté de ses spécificités métier. Plusieurs inconnues pesaient sur les
 exécutables réellement en production : certains binaires n'avaient pas été mis à
 jour depuis longtemps, et les sources se répartissaient entre le dépôt GitLab et
-diverses machines. Toucher à ce code sans filet était d'autant plus risqué que
-le \emph{Valo Engine} calcule le \textbf{coût de chaque appel} : une régression
-ou une panne sur ce maillon peut engendrer des pertes \textbf{de l'ordre du
-million d'euros en une semaine}. La dette tenait donc à l'absence de tout moyen
-de garantir qu'un correctif n'introduise pas, par inadvertance, un
+diverses machines. Toucher à ce code sans filet exposait au risque financier
+rappelé en introduction de ce chapitre : la dette tenait à l'absence de tout
+moyen de garantir qu'un correctif n'introduise pas, par inadvertance, un
 \textbf{changement de logique métier} sur l'un de ces forks.
 
-\section{Objectif de la mission}
+\subsection{Objectif de la mission}
 % TODO : faire évoluer le framework (tâche 3) pour qu'il supporte
 % plusieurs forks avec un socle de tests mutualisé.
 La mission a consisté à \textbf{porter le framework de test} vers l'ensemble des
@@ -47,7 +45,7 @@ les moindres détails, mais de disposer d'un \textbf{contrôle sur le code méti
 de chaque fork : pouvoir y appliquer des correctifs avec l'assurance que la
 logique de valorisation demeurait inchangée.
 
-\section{Conception : factorisation et paramétrage}
+\subsection{Conception : factorisation et paramétrage}
 % TODO : stratégie de portage (abstraction des différences entre forks,
 % configuration par fork, tests communs vs spécifiques). Schéma avant/après.
 La principale difficulté de conception tenait à l'hétérogénéité des réseaux,
@@ -64,44 +62,31 @@ qu'émettre des trames TCP.
 Pour absorber cette diversité, David avait amorcé une refonte du framework
 articulée autour de deux notions complémentaires :
 \begin{itemize}
-  \item un \textbf{core} — le socle commun à toutes les versions supportées. Il
+  \item un \textbf{core}, socle commun à toutes les versions supportées. Il
         porte la mécanique invariante : la boucle d'exécution et le
         \emph{parsing} des instructions du langage de test ;
-  \item des \textbf{specs} — une par fork — qui spécifient \emph{quelles}
+  \item des \textbf{specs}, une par fork, qui spécifient \emph{quelles}
         instructions sont disponibles et \emph{comment} elles s'exécutent, en
         fournissant leur \textbf{implémentation runtime} propre au réseau visé.
 \end{itemize}
 Cette séparation \emph{core} / \emph{spec} permet de mutualiser tout ce qui ne
 dépend pas du réseau et de n'isoler, fork par fork, que les différences de
-comportement métier — préparant du même coup la modernisation ultérieure.
+comportement métier, ce qui prépare du même coup la modernisation ultérieure.
 
-\section{Réalisation}
+\subsection{Réalisation}
 % TODO : extrait montrant le mécanisme de paramétrisation par fork.
 Le portage s'est déroulé en \textbf{binôme}. Ayant déposé ma démission, je
 m'inscrivais dans une démarche de \textbf{transmission de connaissances} avec
 Jérémy, recruté en renfort de l'équipe. Travailler à deux lui a permis de
-s'approprier un framework devenu conséquent — de l'ordre de 30~000 lignes, près
-de 40~000 en comptant le code généré pour la communication TCP — tout en menant
+s'approprier un framework devenu conséquent (de l'ordre de 30~000 lignes, près
+de 40~000 en comptant le code généré pour la communication TCP), tout en menant
 le portage à bien.
 
 Concrètement, chaque fork a été décrit par sa \emph{spec}, qui enregistre auprès
 du \emph{core} l'implémentation des instructions propres au réseau ; le
 \emph{core} reste, lui, identique d'un fork à l'autre.
 
-\begin{lstlisting}[language=Python,caption={Paramétrage d'un fork : une \emph{spec} enregistre ses instructions auprès du \emph{core} (extrait illustratif).},label={lst:t5}]
-# Le core fournit la boucle d'exécution et le parsing, communs à tous les forks.
-# Chaque spec n'apporte que ce qui diffère : l'implémentation runtime des
-# instructions et le mode de communication avec l'engine (TCP ou CDR).
-class SpecItalieB2C(Spec):
-    charging = OfflineCharging()      # consommation de CDR (fichiers)
-
-    @instruction("appel_voix")
-    def appel_voix(self, ctx, args):
-        cdr = self.charging.encoder_cdr(args)   # encodage au format du fork
-        ctx.engine.consommer(cdr)               # alimente le Valo Engine legacy
-\end{lstlisting}
-
-\section{Difficultés rencontrées}
+\subsection{Difficultés rencontrées}
 % TODO : divergences de comportement entre forks, rétro-compatibilité.
 Deux obstacles ont dominé la réalisation. Le premier a été le \textbf{décodage du
 format binaire des CDR}. Ces enregistrements sont certes normalisés en amont par
@@ -116,7 +101,7 @@ accueillir des tests}. Il a donc fallu trouver le moyen de les \textbf{démarrer
 de les \textbf{arrêter} et de \textbf{dialoguer} avec eux, sans le point d'entrée
 dédié dont bénéficiait le prépayé.
 
-\section{Expérimentation : l'IA agentique au service de la transmission}
+\subsection{Expérimentation : l'IA agentique au service de la transmission}
 % Retour d'expérience sur l'usage des LLM agentiques (Cursor, agent OpenAI)
 % pendant le portage et la transmission à Jérémy. Corrobore une étude IBM
 % sur les impacts des LLM sur la production de code.
@@ -124,7 +109,7 @@ La révision de la stratégie de gestion de la dette technique s'est accompagné
 d'une inflexion plus large dans la manière dont Free Mobile entendait voir ses
 \textbf{logiciels internes développés}. L'entreprise a notamment revu sa
 \textbf{politique vis-à-vis des IA externes} et déployé des \textbf{licences
-d'\gls{ia-agentique}} — au premier rang desquelles \textbf{Cursor} — à
+d'\gls{ia-agentique}}, au premier rang desquelles \textbf{Cursor}, à
 l'ensemble de ses développeurs. Ce portage, mené en binôme et placé sous le
 signe de la \textbf{transmission de connaissances}, m'a offert un terrain
 d'\textbf{expérimentation} idéal pour éprouver les capacités de production
@@ -135,17 +120,17 @@ produire du code~\cite{ibm-llm}.
 Le framework reposait sur un socle \emph{core} / \emph{spec} (section
 précédente) pensé, après refonte, pour \textbf{supporter son extensibilité}.
 Cette qualité d'architecture s'est révélée déterminante : tant que l'on demeurait
-dans un \textbf{cadre déjà balisé} — décrire un nouveau fork à l'aide
-d'instructions \emph{standards}, sans sortir vers des fonctionnalités encore
-\textbf{non développées} —, il était relativement simple de \textbf{guider le
+dans un \textbf{cadre déjà balisé}, c'est-à-dire décrire un nouveau fork à l'aide
+d'instructions \emph{standards} sans sortir vers des fonctionnalités encore
+\textbf{non développées}, il était relativement simple de \textbf{guider le
 \gls{llm}} vers le résultat attendu. Sur ce périmètre, le gain de
 \textbf{productivité} fut considérable.
 
 Deux facteurs sont toutefois apparus comme \textbf{conditionnant} ce gain.
 
 Le premier tient à la \textbf{maîtrise préalable de l'architecture}. Ayant
-réalisé l'essentiel du framework — quoique d'autres développeurs y aient
-également contribué —, j'en avais une \textbf{vision fine}, ce qui rendait
+réalisé l'essentiel du framework (quoique d'autres développeurs y aient
+également contribué), j'en avais une \textbf{vision fine}, ce qui rendait
 \textbf{aisée la rédaction de \emph{prompts} adéquats} pour obtenir précisément
 ce que je visais. L'IA \textbf{amplifiait} ici une compréhension déjà constituée
 plutôt qu'elle ne s'y substituait.
@@ -155,8 +140,8 @@ décodage des \gls{cdr}. Ce travail a en partie été conduit par Jérémy
 \textbf{en mon absence}, durant une période de cours, à l'aide de la solution
 \textbf{agentique d'OpenAI}. Les résultats se sont révélés \textbf{décevants},
 et même \textbf{plus complexes} que la solution finalement retenue. Ce relatif
-échec s'explique avant tout par un \textbf{manque de connaissance} — à la fois du
-\textbf{code métier} sous-jacent et de l'\textbf{architecture du framework} —,
+échec s'explique avant tout par un \textbf{manque de connaissance}, à la fois du
+\textbf{code métier} sous-jacent et de l'\textbf{architecture du framework},
 qui empêchait de formuler les instructions justes et de juger sainement les
 propositions du modèle.
 
@@ -166,23 +151,23 @@ test avait été développé de façon relativement \textbf{isolée}, surtout de
 départ de David Desmarest : peu de personnes dans l'équipe en conservaient une
 \textbf{connaissance fine}. Or un \gls{llm} produit de \textbf{grands volumes de
 code d'un seul tenant}, ce qui rendait les modifications \textbf{ardues à
-relire} — au point de soulever une question vertigineuse : ne faudrait-il pas
+relire}, au point de soulever une question vertigineuse : ne faudrait-il pas
 \textbf{confier la revue à l'IA} elle-même ? Une telle délégation se ferait
 pourtant au \textbf{détriment de la transmission des connaissances} et de
-l'\textbf{harmonisation} du style d'écriture du code — deux garde-fous pourtant
+l'\textbf{harmonisation} du style d'écriture du code, deux garde-fous pourtant
 essentiels contre l'accumulation d'une nouvelle dette.
 
 J'en retire un constat qui fait directement écho au fil rouge de ce mémoire : le
 \gls{llm} agit comme un \textbf{levier}, non comme un substitut. Sa productivité
-est \textbf{proportionnée à la maîtrise} — de l'architecture comme du domaine
-métier — de celui qui le pilote, et à la \textbf{qualité du cadre} dans lequel il
-opère. Une base bien architecturée et extensible, c'est-à-dire \textbf{peu
+est \textbf{proportionnée à la maîtrise} que possède celui qui le pilote, de
+l'architecture comme du domaine métier, et à la \textbf{qualité du cadre} dans
+lequel il opère. Une base bien architecturée et extensible, c'est-à-dire \textbf{peu
 endettée}, démultiplie son apport ; à l'inverse, sur un terrain \emph{legacy} ou
 opaque, mal maîtrisé, il tend à produire un code \textbf{plus complexe} et moins
 fiable. L'outil ne dispense donc pas de la \textbf{connaissance} : il la
 \textbf{récompense}.
 
-\section{Résultats et bénéfice business}
+\subsection{Résultats et bénéfice business}
 % TODO : maintenance unifiée, non-régression sur tous les forks d'un coup,
 % réduction de la duplication. Relier au thème dette technique.
 Le portage a étendu le filet de non-régression aux forks legacy du \emph{Valo
