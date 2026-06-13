@@ -9,8 +9,7 @@
 Le framework de test (section~\ref{chap:t3}) avait été conçu pour le
 \emph{Valo Engine} du \textbf{réseau prépayé} de Free Mobile, un réseau alors
 nouveau. Une fois ce dernier mis en production et jugé \textbf{stable}, la
-stratégie de gestion de la dette technique a été révisée, une inflexion qui a
-coïncidé avec le départ de David.
+stratégie de gestion de la dette technique a été révisée.
 
 La stratégie initiale faisait du prépayé le socle d'une \textbf{base de code
 commune et moderne}, destinée à être réutilisée par les moteurs de valorisation
@@ -74,12 +73,11 @@ dépend pas du réseau et de n'isoler, fork par fork, que les différences de
 comportement métier, ce qui prépare du même coup la modernisation ultérieure.
 
 \subsection{Réalisation}
-% TODO : extrait montrant le mécanisme de paramétrisation par fork.
 Le portage s'est déroulé en \textbf{binôme}. Ayant déposé ma démission, je
 m'inscrivais dans une démarche de \textbf{transmission de connaissances} avec
 Jérémy, recruté en renfort de l'équipe. Travailler à deux lui a permis de
 s'approprier un framework devenu conséquent (de l'ordre de 30~000 lignes, près
-de 40~000 en comptant le code généré pour la communication TCP), tout en menant
+de 40~000 en comptant le code généré pour la communication HTTP), tout en menant
 le portage à bien.
 
 Concrètement, chaque fork a été décrit par sa \emph{spec}, qui enregistre auprès
@@ -168,18 +166,24 @@ fiable. L'outil ne dispense donc pas de la \textbf{connaissance} : il la
 \textbf{récompense}.
 
 \subsection{Résultats et bénéfice business}
-% TODO : maintenance unifiée, non-régression sur tous les forks d'un coup,
-% réduction de la duplication. Relier au thème dette technique.
-Le portage a étendu le filet de non-régression aux forks legacy du \emph{Valo
-Engine} : les correctifs de stabilisation pouvaient désormais être appliqués
+Le portage a étendu le filet de non-régression à l'ensemble des réseaux du
+\emph{Valo Engine} : \textbf{sept réseaux} au total, soit les six forks legacy
+(France B2C et B2B, Caraïbes, Italie B2C et B2B, proxy italien) et le réseau
+prépayé. Les correctifs de stabilisation pouvaient désormais être appliqués
 avec l'assurance qu'aucun \textbf{changement de logique métier} ne s'y glissait à
 l'insu de l'équipe. Sur un composant dont une défaillance se chiffre en millions
 d'euros par semaine, ce contrôle constitue avant tout une \textbf{maîtrise du
 risque financier}.
 
-Au-delà du gain immédiat, l'architecture \emph{core} / \emph{spec} factorise la
+Quantifier le nombre de régressions ainsi « évitées » serait toutefois trompeur :
+le framework s'exécutant en \gls{ci} \textbf{avant tout \emph{merge}}, un défaut
+introduit par un correctif est intercepté avant même d'être intégré à la branche
+principale. Il ne devient donc jamais une régression au sens strict, puisqu'il
+n'atteint ni l'intégration ni la production. C'est précisément l'effet recherché :
+le bénéfice ne se mesure pas en incidents corrigés, mais en incidents qui n'ont
+jamais eu lieu.
+
+Au-delà de ce gain, l'architecture \emph{core} / \emph{spec} factorise la
 mécanique commune et n'isole que les spécificités de chaque réseau : elle réduit
 la duplication entre forks et \textbf{prépare la modernisation} envisagée à plus
 long terme (chapitre~\ref{chap:veille}).
-% TODO : quantifier si possible — nombre de forks effectivement couverts,
-% régressions évitées lors des fixes de stabilisation.

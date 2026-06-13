@@ -41,7 +41,7 @@ de données de l'instance d'origine et celles de l'instance de destination, afin
 de substituer chaque identifiant par son équivalent.
 
 \subsection{Conception et choix techniques}
-La logique métier est directe : Grafana expose une \gls{api} HTTP permettant de
+La logique métier est directe : Grafana expose une \gls{api} HTTP\glsadd{http} permettant de
 \textbf{lister} les tableaux de bord et les sources de données d'une instance,
 puis d'y \textbf{créer} de nouveaux objets. L'outil interroge l'instance source,
 construit une \textbf{table de correspondance} entre les sources de données des
@@ -59,7 +59,6 @@ apparentée au \emph{HTML}, mise en forme par des feuilles de style apparentées
 l'environnement de travail des administrateurs.
 
 \subsection{Réalisation}
-% TODO : remplacer par un extrait réel du dépôt (illustratif, pas le code entier).
 Le cœur de l'outil tient dans la réécriture des identifiants : à partir de la
 table de correspondance construite entre les deux instances, chaque référence à
 une source de données présente dans un tableau de bord est substituée par son

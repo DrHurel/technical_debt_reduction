@@ -12,17 +12,18 @@ Première mission menée chez \textbf{Beemo Technologie} (présentée au
 chapitre~\ref{chap:entreprises}), cette tâche est sensiblement plus
 \textbf{courte} que les précédentes, mais n'en est pas moins
 \textbf{déterminante} : elle porte sur l'un des logiciels de Beemo,
-\textbf{l'agent VSX}, et vise à reprendre le contrôle sur une partie de sa
+\textbf{l'agent ESX}, et vise à reprendre le contrôle sur une partie de sa
 \textbf{chaîne de production}. Sa portée dépasse le simple correctif : il s'agit
 d'\textbf{automatiser} et d'\textbf{harmoniser} la méthode de fabrication de cet
 agent, ce qui la rend, à mes yeux, aussi structurante que la réalisation du
 framework de test étalée sur près d'un an et demi.
 
-Avant cette mission, mettre à jour l'agent VSX supposait une manipulation
+Avant cette mission, mettre à jour l'agent ESX supposait une manipulation
 manuelle et fragile : on \textbf{poussait la base de code vers une machine
-distante}, sur laquelle elle était compilée avec le \textbf{DSDK}, le
-\gls{sdk} fourni par Broadcom pour la réalisation de \emph{daemons} (processus
-d'arrière-plan), avant de pouvoir être testée.
+distante}, sur laquelle elle était compilée avec le \textbf{DSDK}
+(\emph{Daemon SDK}), le \gls{sdk} fourni par VMware (désormais Broadcom) pour
+développer les \emph{daemons} (services d'arrière-plan) exécutés sur les
+hyperviseurs ESXi, avant de pouvoir être testée.
 
 La dette technique est apparue avec le \textbf{passage à la version~8 du DSDK},
 nécessaire pour supporter la version~8 de l'agent. Dans sa configuration de
@@ -58,18 +59,13 @@ s'imposait, le SDK n'exposant aucun moyen standard d'agir sur ses flags de
 compilation.
 
 \subsection{Démarche de rétro-ingénierie}
-% TODO : c'est le cœur de cette tâche — détailler la méthode :
-% - analyse des artefacts (binaires, symboles, \gls{abi}/\gls{api}, headers)
-% - reconstitution de la \gls{toolchain} / des dépendances manquantes
-% - outils utilisés (objdump, nm, strings, ldd, débogueur... à adapter)
-% - itérations d'essais-erreurs
 Le cœur de la tâche a consisté à \textbf{retrouver où et comment le DSDK injecte
 ses flags de compilation}. Cette mécanique n'est \textbf{pas exposée} par le
 SDK : il n'existe aucune option officielle pour assouplir le couple
-\texttt{-Wall -Werror}. Il a donc fallu \textbf{analyser le système de build du
-DSDK lui-même} pour localiser le point précis où ces flags sont posés, puis
-déterminer comment les neutraliser sans dénaturer le reste de la
-\gls{toolchain}.
+\texttt{-Wall -Werror}. Le DSDK reposant sur le système de construction
+\textbf{SCons}, il a fallu \textbf{rétro-concevoir ses fichiers de build} pour
+localiser le point précis où ces flags sont posés, puis déterminer comment les
+neutraliser sans dénaturer le reste de la \gls{toolchain}.
 
 La difficulté principale n'a pas été d'identifier la modification à apporter,
 mais de \textbf{trouver le bon point d'injection} : le DSDK \textbf{n'est pas
@@ -79,8 +75,6 @@ simple : il a suffi de cibler les fichiers concernés et d'en dériver des
 correctifs reproductibles.
 
 \subsection{Réalisation}
-% TODO : extrait de configuration de build / commande / patch ayant
-% débloqué la compilation (commenté).
 La solution repose sur un \textbf{Dockerfile} qui reconstitue l'environnement de
 compilation auparavant confiné à la machine distante, puis applique les
 correctifs du SDK de façon déterministe. Chaque modification est isolée dans un
@@ -107,7 +101,7 @@ correctifs du SDK, jadis tributaires d'un seul développeur, sont désormais
 \textbf{capitalisés sous forme de patchs} : leur logique survit à tout départ,
 ce qui répond directement au risque de \textbf{perte de connaissance} à l'origine
 de la dette. En supprimant le frein imposé par \texttt{-Wall -Werror}, l'équipe
-retrouve sa capacité à \textbf{livrer des mises à jour de l'agent VSX en
+retrouve sa capacité à \textbf{livrer des mises à jour de l'agent ESX en
 continu}.
 
 Le chantier restant, à savoir résoudre l'impact sur la certification, s'inscrit dans

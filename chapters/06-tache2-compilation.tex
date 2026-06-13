@@ -38,9 +38,10 @@ Le pic se produit à l'\textbf{édition des liens}. L'éditeur de liens doit y
 rassembler tous les fichiers objets et \textbf{dédupliquer} les définitions
 redondantes d'une même fonction ou instanciation, issues des multiples unités de
 traduction ; l'empreinte mémoire de cette étape explose à mesure que le nombre de
-symboles croît. En lançant une compilation parallèle exploitant l'ensemble des
-cœurs d'une machine, de l'ordre de \textbf{24}, la \gls{toolchain} \textbf{saturait
-la RAM} précisément à cette phase de liaison, rendant la compilation instable
+symboles croît. En lançant, via les \emph{makefiles} générés par \textbf{CMake}, une compilation
+parallèle exploitant l'ensemble des cœurs d'une machine, de l'ordre de
+\textbf{24}, la \gls{toolchain} \textbf{saturait la RAM} précisément à cette
+phase de liaison, rendant la compilation instable
 voire impossible à mener à son terme. La dette était ici nichée dans la
 \textbf{chaîne de compilation} elle-même : un atout de productivité (le
 parallélisme) se retournait en obstacle.
@@ -70,18 +71,18 @@ la machine.
 des en-têtes et des templates, trouve une réponse dans les \textbf{modules} de
 \textbf{C++20}, qui compilent une interface \textbf{une seule fois} au lieu de la
 réanalyser à chaque inclusion. Cette voie n'était toutefois pas exploitable :
-\textbf{le support des modules reste partiel} dans les compilateurs. À titre de
-repère, sur Ubuntu~24.04 LTS, \texttt{g++}~13.3 conserve \textbf{C++17} comme
-standard \emph{par défaut} (\verb|__cplusplus = 201703L|) ; l'adoption de C++20 ou
-C++23, et de leurs modules, supposerait une migration de la \gls{toolchain} qui
-n'est pas encore une option standard et mûre.
-% TODO (Claude) : à la réécriture, revérifier le standard C++ par défaut et le
-%   compilateur le plus avancé sur l'environnement de PRODUCTION ciblé (la valeur
-%   ci-dessus a été constatée localement sur g++ 13.3 / Ubuntu 24.04).
+\textbf{le support des modules reste partiel} dans les compilateurs, et surtout
+ceux-ci continuent de retenir un standard antérieur \emph{par défaut}. À titre
+de repère, sur Ubuntu~24.04 LTS, \texttt{g++}~13.3 conserve \textbf{C++17}
+(\verb|__cplusplus = 201703L|) ; et cette valeur n'a rien d'une survivance de
+l'environnement local, puisque les versions les plus récentes de la chaîne GNU
+conservent ce même défaut : \texttt{g++}~15 retient toujours
+\texttt{-std=gnu++17}, le basculement vers C++20 par défaut n'étant annoncé que
+pour \texttt{g++}~16~\cite{gcc15changes}. L'adoption de C++20 ou C++23, et de
+leurs modules, supposerait donc une migration explicite de la \gls{toolchain}
+qui n'est pas encore une option standard et mûre.
 
 \subsection{Réalisation}
-% TODO (auteur) : insérer l'extrait réel (configuration de build / script
-%        d'ordonnancement) si disponible.
 L'idée se matérialise en \textbf{limitant la concurrence de l'étape de liaison}
 indépendamment de celle de la compilation, de sorte que le pic mémoire cumulé
 des éditions de liens reste sous le plafond de la machine.

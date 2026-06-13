@@ -12,15 +12,15 @@ s'agit de fournir aux \textbf{professionnels}, c'est-à-dire aux hébergeurs et
 aux entreprises pour qui la donnée constitue un actif critique, un moyen de
 \textbf{sécuriser leurs données} et de garantir leur \textbf{restauration} en cas d'incident, qu'il soit
 d'origine \textbf{physique} ou \textbf{malveillante}. Le produit central, la
-\textbf{BBox}, est une appliance de \textbf{sauvegarde} qui peut être
+\textbf{Beebox}, est une appliance de \textbf{sauvegarde} qui peut être
 \textbf{externalisée} hors site afin de survivre à la destruction du système
 d'origine.
 
 L'un des scénarios de perte de données les plus redoutés est le
 \textbf{ransomware}, qui chiffre les données d'un système pour en exiger une
-rançon. La BBox répond directement à cette menace en conservant des
+rançon. La Beebox répond directement à cette menace en conservant des
 \textbf{jeux de sauvegarde} hors d'atteinte du système compromis. Mais une
-question demeure : \textbf{que se passe-t-il si la BBox elle-même est
+question demeure : \textbf{que se passe-t-il si la Beebox elle-même est
 compromise} ? Un attaquant parvenu jusqu'à l'appliance pourrait alors tenter
 d'\textbf{altérer les jeux de sauvegarde} ou de \textbf{saboter leur
 restauration}, anéantissant ainsi la dernière ligne de défense du client.
@@ -92,12 +92,65 @@ elle \textbf{empêche la suppression} d'un jeu de sauvegarde considéré comme
 immuable tant que le \textbf{délai de rétention} n'a pas été respecté.
 
 \subsection{Réalisation}
-% TODO : extrait de code de production commenté + éventuels tests associés.
 La couche d'adaptation est le point d'entrée de toute la fonctionnalité :
 une classe moderne expose le service d'immuabilité au reste du système, tout
 en dissimulant les appels au firmware historique derrière un pointeur opaque
-transmis à la construction.
-% TODO (auteur) : insérer un extrait réel du code de production (commenté).
+transmis à la construction. Ce procédé est l'idiome \textbf{PIMPL}
+(\emph{Pointer to Implementation}) : l'en-tête public ne déclare qu'une classe
+d'implémentation \emph{anticipée} et un \texttt{std::unique\_ptr} vers
+celle-ci, sans rien révéler ni inclure de l'existant
+(listing~\ref{lst:pimpl-h}).
+
+\begin{lstlisting}[language=C++,caption={En-tête de la couche d'adaptation : aucune dépendance vers \texttt{main.h}.},label={lst:pimpl-h}]
+// immutability.h - exposed to new code, does NOT include main.h
+#include <memory>
+
+class Immutability {
+public:
+    Immutability();
+    ~Immutability();
+
+    void lock(BackupSet& set, Duration retention);
+
+private:
+    class Impl;                   // forward declaration only
+    std::unique_ptr<Impl> pimpl;  // opaque pointer to the implementation
+};
+\end{lstlisting}
+
+Tout le couplage avec le legacy est alors \textbf{confiné à un seul fichier
+source} (listing~\ref{lst:pimpl-cpp}) : c'est la seule unité de traduction qui
+inclut \texttt{main.h}. Le code client, lui, ne compile plus que contre une
+interface propre, et une modification interne du firmware n'entraîne pas sa
+recompilation.
+
+\begin{lstlisting}[language=C++,caption={Source de la couche d'adaptation : le legacy est confiné à cette unité de traduction.},label={lst:pimpl-cpp}]
+// immutability.cpp - the only translation unit aware of the legacy firmware
+#include "immutability.h"
+#include "main.h"  // legacy coupling confined here
+
+class Immutability::Impl {
+public:
+    void lock(BackupSet& set, Duration retention) {
+        legacy_pause_scheduler();  // call into the historic firmware
+        // ... modern logic: state machine, encryption
+    }
+};
+
+Immutability::Immutability() : pimpl(std::make_unique<Impl>()) {}
+Immutability::~Immutability() = default;  // defined where Impl is complete
+
+void Immutability::lock(BackupSet& set, Duration retention) {
+    pimpl->lock(set, retention);
+}
+\end{lstlisting}
+
+Le destructeur est volontairement défini dans le fichier source, là où le type
+\texttt{Impl} est \emph{complet} : c'est la condition pour que
+\texttt{std::unique\_ptr} sache détruire un type qui n'est qu'\emph{anticipé}
+dans l'en-tête. Ce détail résume l'esprit de la mission : écrire un C++
+moderne et correct \emph{au contact} d'un existant endetté, sans en propager
+les dépendances.
 
 \subsection{Difficultés rencontrées}
 % TODO : contraintes du code existant, revues, exigences de qualité.
@@ -128,7 +181,7 @@ s'insère dans un firmware fortement dégradé et dépourvu de filet de sécurit
 Sur le plan \textbf{business}, l'immuabilité renforce directement la
 \textbf{proposition de valeur} de Beemo : elle protège les jeux de sauvegarde
 non seulement contre la compromission du système client, mais aussi contre la
-\textbf{compromission de la BBox elle-même}. En garantissant qu'un jeu de
+\textbf{compromission de la Beebox elle-même}. En garantissant qu'un jeu de
 sauvegarde immuable ne peut être ni supprimé ni altéré avant l'expiration de son
 \textbf{délai de rétention}, et en \textbf{bloquant} la box au moindre signe
 d'altération détecté par le chiffrement, la fonctionnalité ferme l'un des

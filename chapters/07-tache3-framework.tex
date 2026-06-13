@@ -24,7 +24,7 @@ y introduire de la logique : un test pouvait dès lors échouer non à cause d'u
 régression du logiciel testé, mais à cause d'un défaut du test lui-même. La
 frontière entre code de test et code testé devenait floue, ce qui fragilisait la
 confiance accordée à ce filet de sécurité. À cela s'ajoutait un couplage de bas
-niveau : le protocole de communication du moteur, un protocole TCP décrit en C,
+niveau : le protocole de communication du moteur, un protocole TCP\glsadd{tcp} décrit en C,
 était embarqué dans le Lua, ce qui rendait la suite délicate à maintenir.
 
 \subsection{Objectif de la mission}
@@ -52,7 +52,7 @@ de leurs homologues C ; on reconstitue ainsi un échange de trames identique à
 celui du moteur sans recourir au langage natif.
 
 Le framework prend en entrée des scénarios de test rédigés en YAML. Ces
-scénarios sont analysés par un \textbf{parseur SAX}, qui présente deux
+scénarios sont analysés par un \textbf{parseur SAX}\glsadd{sax}, qui présente deux
 avantages : il permet de récupérer la position (ligne) de chaque instruction,
 qui est transmise au débogueur pour offrir une exécution \emph{pas à
 pas}, et il interrompt l'analyse dès la première erreur de syntaxe en
@@ -92,14 +92,118 @@ comparaison des snapshots étant déléguées à la bibliothèque \textbf{syrupy
 \subsection{Réalisation}
 Du point de vue du rédacteur de test, tout tient dans le scénario YAML :
 une suite d'instructions déclaratives, jouées séquentiellement, qui décrivent
-un flux d'appel et les vérifications attendues.
-% TODO (auteur) : insérer ici un extrait réel de scénario YAML du dépôt.
+un flux d'appel et les vérifications attendues. L'extrait ci-dessous
+(listing~\ref{lst:scenario-t3}) illustre un scénario d'appel voix national
+sortant : on y déclare les données de départ (client, forfaits, localisations),
+puis on enchaîne la mise en place du contexte (\texttt{setup}), l'appel
+(\texttt{voice\_call}) et les vérifications attendues (\texttt{check}).
+
+\begin{lstlisting}[language=yaml,caption={Scénario de test d'un appel voix national sortant.},label={lst:scenario-t3}]
+customers:
+  - id: 81
+    msisdn: 33612345005
+    imsi: 2015012345005
+    wallet: 5000
+    default_package: 1021
+    packages:
+      - id: 1067
+        current_value: 12345
+        expiration_date: "2028-12-01T12:00:00Z"
+
+localizations:
+  france:
+    vlr: 33695029402
+  australia:
+    vlr: 61
+
+voice_nat_mo:
+  - setup:
+      location: $france
+      customer: 81
+      variables:
+        call_duration: 24s
+        reservation_duration: 1mn
+  - voice_call:
+      called_number: 336518995221
+      duration: $call_duration
+      reservation: $reservation_duration
+  - check:
+      - last-engine-status: TERMINATE_SUCCESS
+      - interval:
+      - cdr:
+          charge: 2cts
+\end{lstlisting}
+
+On note la concision du format : la variable \texttt{\$france} ou
+\texttt{\$call\_duration} référence une donnée déclarée plus haut, et le bloc
+\texttt{check} ne contient que des constats (statut du moteur, intervalle, ligne
+de facturation à 2~centimes) sans la moindre logique d'assertion.
 
 Côté framework, chaque nom d'instruction est résolu via le \emph{registry}
 des commandes : la \emph{factory} instancie l'objet \emph{Command}
 correspondant, qui encapsule l'envoi des trames TCP au \emph{Valo Engine},
 reconstituées en Python grâce aux structures \texttt{ctypes} équivalentes aux
-structures C du protocole. Les instructions de vérification, elles, ne
+structures C du protocole. L'inscription au \emph{registry} est purement
+déclarative : un décorateur \texttt{@instruction} associe une classe à son
+nom de scénario (et à ses éventuels alias hérités du Lua), de sorte
+qu'ajouter une instruction au langage se résume à écrire une classe
+(listing~\ref{lst:command-t3}).
+
+\begin{lstlisting}[language=Python,caption={Squelette d'une instruction du framework (patron \emph{Command}).},label={lst:command-t3}]
+"""
+Play a voice_call between a User and someone for a certain duration
+"""
+
+@instruction("voice-call", legacy=["voice_call"])
+class VoiceCall(Instruction[dict[str, Any]]):
+
+    def __init__(self, ref: Mark, options: dict[str, Any]):
+        super().__init__(ref, options)
+
+    def exec(self, context: BaseContext):
+        # Run the logic behind a voice-call
+        return
+\end{lstlisting}
+
+Le décorateur \texttt{@instruction("voice-call", legacy=["voice\_call"])}
+enregistre la classe sous son nom courant tout en conservant l'alias
+\texttt{voice\_call} employé par les anciens scénarios ; le paramètre
+\texttt{ref} (de type \texttt{Mark}) porte la position en ligne issue du
+parseur SAX, exploitée par le débogueur, et \texttt{options} reçoit les
+arguments déclarés dans le YAML. Toute la logique propre à l'instruction se
+concentre dans la méthode \texttt{exec}.
+
+Le décorateur lui-même (listing~\ref{lst:registry-t3}) se réduit à peupler un
+dictionnaire global, le \emph{registry}, qui associe chaque nom d'instruction
+à sa classe. Une assertion vérifie au passage que toute classe décorée hérite
+bien de \texttt{Instruction}, garde-fou qui transforme une erreur d'extension
+du framework en message explicite plutôt qu'en défaillance silencieuse à
+l'exécution.
+
+\begin{lstlisting}[language=Python,caption={Le décorateur \texttt{@instruction} : enregistrement d'une commande dans le \emph{registry}.},label={lst:registry-t3}]
+instruction_registry: dict[str, type[Instruction[Any]]] = {}
+
+T = TypeVar("T")
+
+
+def instruction(name: str, legacy: Optional[list[str]] = None):
+
+    def annotation(cls: type[T]) -> type[T]:
+        casted_cls = cast(Any, cls)
+        assert issubclass(
+            casted_cls, Instruction
+        ), f"Framework extension error : {cls.__name__} doesn't extends Instruction"
+
+        casted_cls.YAML_TAG = name
+        instruction_registry[name] = casted_cls
+        # ... enregistrement des alias "legacy" (extrait tronque)
+
+        return cls
+
+    return annotation
+\end{lstlisting}
+
+Les instructions de vérification, elles, ne
 contiennent aucune assertion explicite : elles sérialisent l'état observé
 (actions jouées, contenu de la base), que syrupy compare au \emph{snapshot}
 de référence. Un test échoue donc pour une raison et une seule : l'état
@@ -122,13 +226,12 @@ reporting éprouvé, il recèle aussi de nombreux mécanismes implicites, sa
 compliquer le développement d'une surcouche.
 
 \subsection{Résultats et bénéfice business}
-% TODO (auteur) : si disponible, chiffrer (nombre de scénarios, régressions
-% détectées avant mise en production).
 Le framework a remplacé la suite Lua sur l'ensemble de son périmètre
 fonctionnel (appels voix, SMS, MMS, consommation de data et vérification des
-données produites), tout en éliminant sa fragilité structurelle : les scénarios
-étant purement déclaratifs, l'échec d'un test signale désormais une
-régression du moteur, et non un défaut du test. C'est toute la valeur du
+données produites) et totalisait, en fin de parcours, \textbf{plus de deux
+cents scénarios} de test, tout en éliminant la fragilité structurelle de
+l'ancienne suite : les scénarios étant purement déclaratifs, l'échec d'un test
+signale désormais une régression du moteur, et non un défaut du test. C'est toute la valeur du
 filet de sécurité qui s'en trouve restaurée : l'équipe peut faire confiance
 au verdict de la suite, condition première pour que les tests soient
 réellement consultés et maintenus.

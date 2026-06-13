@@ -57,12 +57,6 @@ le \emph{Valo Engine} en \textbf{mode débogage} et de progresser pas à pas
 test, mais descend jusqu'au code natif du logiciel sous test.
 
 \subsection{Conception et choix techniques}
-% TODO : un SCHÉMA d'architecture serait le bienvenu :
-% \begin{figure}[H]\centering
-%   \includegraphics[width=0.85\textwidth]{archi-extensions-vscode.png}
-%   \caption{Architecture de l'extension et son dialogue avec le framework.}
-%   \label{fig:archi-t2}
-% \end{figure}
 Le choix du \gls{lsp} répond à un principe de \textbf{découplage} entre l'éditeur
 et le langage : la logique d'analyse et de complétion est portée par un serveur
 indépendant, réutilisable au-delà de VS Code par tout éditeur compatible. Le
@@ -73,20 +67,80 @@ l'exécution.
 
 Le débogueur, lui, repose sur le \textbf{Debug Adapter Protocol} (\gls{dap}),
 protocole standardisé par VS Code pour piloter une session de débogage au moyen
-d'échanges \emph{JSON-RPC}. Côté framework, son intégration s'appuie sur un
+d'échanges \emph{JSON-RPC}\glsadd{json}\glsadd{rpc}. Côté framework, son intégration s'appuie sur un
 module qui contrôle le flot d'exécution du test (mise en pause, reprise,
 progression pas à pas), tout en remontant à l'éditeur les données nécessaires au
 diagnostic.
 
 Les seules données internes au framework de test ne suffisent toutefois pas à
 diagnostiquer l'ensemble des problèmes : il faut aussi connaître l'état interne
-du moteur. Un \textbf{service} dédié, développé par David, a donc été mis en
-place pour exposer l'état des variables internes du \emph{Valo Engine}.
-L'extension dialogue avec ce service via \textbf{HTTP} et restitue ces valeurs
-directement dans l'\gls{ide}, aux côtés de l'état du test.
+du moteur. C'est le \textbf{framework} qui centralise ces informations : il
+interroge le \emph{Valo Engine} au travers d'une \textbf{API privée} et de
+plusieurs API publiques du moteur, dont un \textbf{service} dédié, développé
+par David, qui expose l'état de ses variables internes. L'extension, elle, ne
+dialogue qu'avec le framework, sur l'unique canal du \gls{dap} : c'est ce
+dernier qui lui restitue aussi bien l'état du test que celui du moteur, valeurs
+ensuite affichées directement dans l'\gls{ide}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    font=\small,
+    >={Stealth[length=2mm]},
+    sub/.style={draw=muted, rounded corners=2pt, fill=white, align=center,
+                inner sep=5pt, font=\footnotesize, text width=2.9cm,
+                minimum height=11mm},
+    grp/.style={rounded corners=3pt, inner sep=10pt},
+    eng/.style={draw=coraldeep, rounded corners=2pt, fill=coral!20, align=center,
+                inner sep=7pt, text width=6cm, minimum height=11mm},
+    proto/.style={font=\footnotesize\itshape, color=muted, align=center},
+    link/.style={<->, thick, draw=coraldeep},
+    api/.style={->, thick, draw=coraldeep},
+  ]
+
+  % --- Étage 1 : extension VS Code (clients) ---
+  \node[sub] (lspc) {Client \textsc{lsp}\\\scriptsize autocomplétion,\\diagnostics};
+  \node[sub, right=16mm of lspc] (dapc)
+       {Client \textsc{dap}\\\scriptsize points d'arrêt,\\pas à pas};
+
+  % --- Étage 2 : framework de test (le pivot) ---
+  \node[sub, below=24mm of lspc] (lsps)
+       {Serveur \textsc{lsp}\\\scriptsize exploite la grammaire\\du format de test};
+  \node[sub, below=24mm of dapc] (daps)
+       {Adaptateur \textsc{dap}\\\scriptsize contrôle le flot\\d'exécution du test};
+
+  % --- Étage 3 : moteur ---
+  \node[eng, below=22mm of $(lsps)!0.5!(daps)$] (engine)
+       {\textbf{Valo Engine}\\\scriptsize API privée + APIs publiques\\(service d'état des variables, par David)};
+
+  % --- Conteneurs (arrière-plan) ---
+  \begin{scope}[on background layer]
+    \node[grp, draw=codekw, fill=codekw!6, fit=(lspc)(dapc)] (ide) {};
+    \node[grp, draw=coraldeep, fill=coral!10, fit=(lsps)(daps)] (fw) {};
+  \end{scope}
+  \node[anchor=south, font=\footnotesize\bfseries, color=codekw]
+        at (ide.north) {Visual Studio Code — extension (TypeScript)};
+  \node[anchor=south, font=\footnotesize\bfseries, color=coraldeep]
+        at (fw.north) {Framework de test};
+
+  % --- Liens ---
+  \draw[link] (lspc) -- (lsps)
+        node[proto, midway, left=2mm] {protocole \textsc{lsp}\\(JSON-RPC)};
+  \draw[link] (dapc) -- (daps)
+        node[proto, midway, right=2mm] {\textsc{dap}\\(JSON-RPC)};
+  \draw[api] (fw.south) -- (engine.north)
+        node[proto, midway, right=2mm] {API privée\\+ APIs publiques};
+
+\end{tikzpicture}
+\caption{Architecture de l'extension. VS Code dialogue avec le framework de
+test sur deux canaux \emph{JSON-RPC} : le \gls{lsp} pour l'assistance à
+l'édition, le \gls{dap} pour le débogage. En position de pivot, le framework
+interroge le \emph{Valo Engine} via ses API et restitue à l'éditeur aussi bien
+l'état du test que celui du moteur.}
+\label{fig:archi-extension}
+\end{figure}
 
 \subsection{Réalisation}
-% TODO (auteur) : insérer des extraits réels du dépôt (pas le code entier).
 Côté \gls{lsp}, le serveur s'abonne aux requêtes de complétion émises par
 l'éditeur. À partir de la position du curseur, il détermine le contexte
 grammatical courant et renvoie la liste des propositions adaptées :
@@ -94,8 +148,9 @@ instructions disponibles ou variables déjà déclarées.
 
 Côté débogueur, l'adaptateur \gls{dap} traduit les ordres de l'éditeur (poser un
 point d'arrêt, exécuter l'instruction suivante) en commandes pilotant le flot
-d'exécution du test, puis renvoie l'état courant : instruction en cours, état du
-\emph{Valo Engine} obtenu via le service HTTP.
+d'exécution du test, puis renvoie l'état courant : instruction en cours, ainsi
+que l'état du \emph{Valo Engine} que le framework a préalablement recueilli
+auprès du moteur via ses API.
 
 \subsection{Difficultés rencontrées}
 La première difficulté a tenu à la \textbf{documentation de l'API d'extension de
@@ -110,9 +165,10 @@ La seconde difficulté a porté sur l'\textbf{intégration du \gls{dap}} au
 framework de test. Il a fallu adapter le protocole, fondé sur des échanges
 \emph{JSON-RPC}, à un module capable de contrôler le flot d'exécution d'un test
 tout en remontant les données utiles au diagnostic. La restitution de l'état
-interne du moteur, obtenue par un service HTTP distinct, a par ailleurs supposé
-de coordonner deux canaux de communication (\gls{dap} et HTTP) au sein d'une même
-session de débogage.
+interne du moteur a par ailleurs supposé, côté framework, de réunir au sein
+d'une même session de débogage deux sources d'information (le flot
+d'exécution du test et l'état du moteur interrogé via ses API), l'ensemble
+étant ensuite relayé à l'extension sur le seul canal du \gls{dap}.
 
 \subsection{Résultats et bénéfice business}
 % TODO (auteur) : si disponible, chiffrer (temps d'écriture d'un test,

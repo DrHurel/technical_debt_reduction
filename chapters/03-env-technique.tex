@@ -7,121 +7,91 @@
 %  réellement mobilisé dans les tâches, et regrouper par thème.
 % =====================================================================
 
-\section{Langages et bibliothèques}
 Les environnements techniques de Free Mobile et de Beemo se sont révélés
 suffisamment proches pour que cette similarité ait précisément motivé ma
-candidature : c'est ce type d'environnement qui m'intéressait. Dans les deux
-entreprises, le logiciel principal est écrit en C++, et gravite autour de lui
-un ensemble d'outils externes développés dans différents langages. Pour tout
-ce qui relève du \emph{scripting}, Python est très largement utilisé, le plus
-souvent appelé depuis des scripts \emph{batch} ; on trouve par ailleurs des
-\gls{api} écrites dans des langages moins orientés haute performance que le
-C++.
+candidature : c'est ce type d'environnement qui m'intéressait. Tous deux
+s'organisent autour d'un logiciel principal écrit en C++, qu'entoure un
+ensemble d'outils satellites. Plutôt que d'en dresser l'inventaire, ce chapitre
+s'en tient à ce que mes missions ont effectivement mobilisé et renvoie aux
+travaux pour le détail de chaque usage ; le reste de la pile n'est évoqué qu'en
+arrière-plan, le temps de situer le terrain.
 
-Le choix du C++ comme langage principal tient d'abord à l'attrait du langage
-lui-même : il a beaucoup évolué et propose aujourd'hui une bibliothèque
-standard et des fonctionnalités permettant d'écrire un code conforme aux
-recommandations issues des dernières avancées du génie logiciel. Étant
-compilé, il offre en outre des performances élevées. Chez Free Mobile, où un
-gros volume de données devait être traité, ce point était impératif ; chez
-Beemo, où les \emph{box} ont vocation à sauvegarder plusieurs téraoctets de
-données, de bonnes performances restent nécessaires pour garantir une
-expérience utilisateur correcte.
+\section{Un socle C++ entouré de langages satellites}
+Dans les deux entreprises, le logiciel central est écrit en C++. Le choix tient
+d'abord à l'attrait du langage lui-même : il a beaucoup évolué et propose
+aujourd'hui une bibliothèque standard et des fonctionnalités permettant
+d'écrire un code conforme aux recommandations issues des dernières avancées du
+génie logiciel. Étant compilé, il offre en outre des performances élevées :
+chez Free Mobile, où un gros volume de données devait être traité, ce point
+était impératif ; chez Beemo, où les \emph{box} ont vocation à sauvegarder
+plusieurs téraoctets de données, de bonnes performances restent nécessaires
+pour garantir une expérience utilisateur correcte.
 
-Le choix de Python répond, lui, à une logique de facilité et de portabilité.
-L'absence d'étape de compilation est une force : elle dispense d'une chaîne
-de \gls{ci}/\gls{cd} complexe pour produire les nombreux outils internes
-utiles au quotidien, et permet ainsi de gagner en productivité. La même
-logique vaut pour les autres langages employés sur les logiciels que l'on
-pourrait qualifier de plus proches du \emph{front} : on n'y recherche pas tant
-des performances élevées qu'un livrable facilement déployable et pouvant être
-mis à jour sans difficulté majeure.
+Autour de ce cœur gravitent des langages plus légers, choisis pour leur
+facilité de déploiement plutôt que pour leur performance : l'absence d'étape de
+compilation dispense d'une chaîne de \gls{ci}/\gls{cd} pour produire les
+nombreux outils internes du quotidien. Python y tient le premier rôle, du
+simple \emph{scripting} appelé en \emph{batch} jusqu'au framework de test
+d'intégration bâti sur Pytest (section~\ref{chap:t3}) ; TypeScript a servi à
+l'extension \emph{Visual Studio Code} qui l'outille (section~\ref{chap:t4}) ;
+et les scénarios de test eux-mêmes reposent sur un format dérivé du YAML\glsadd{yaml},
+complété par des extensions en Lua. C'est cette articulation entre un socle
+compilé exigeant et une périphérie outillée que mes missions ont eu à traiter.
 
-\section{Stockage et transport de données}
-Chez Free Mobile, un effort de standardisation des outils de stockage et de
-transfert de données a été mené. On y retrouve ainsi une base de données
-MySQL pour les usages historiques liés aux utilisateurs, ainsi qu'Apache
-Kafka pour produire des flux de données et remonter des informations vers
-d'autres équipes. Le monitoring s'appuie sur Prometheus, qui permet de
-collecter des métriques directement sur les différents logiciels en
-exploitation.
+\section{Compiler, versionner, intégrer}
+Dans les deux entreprises, les logiciels C++ sont compilés sous Linux avec la
+\gls{toolchain} GNU (\texttt{g++}), mais l'outil qui pilote cette chaîne diffère
+selon les contextes. Chez Free Mobile, la compilation du \emph{Valo Engine} est
+orchestrée par \textbf{CMake}, qui génère les \emph{makefiles} effectivement
+exécutés ; la taille de la base de code y rend la compilation parallèle si
+gourmande en ressources qu'elle devient un sujet d'ingénierie à part entière
+(section~\ref{chap:t2}). Chez Beemo, l'outillage est plus hétérogène : le
+\emph{Beeserver}, logiciel embarqué dans les \emph{box}, est bâti à partir de
+\emph{makefiles} écrits à la main, CMake n'étant pas déployable sur une partie
+du parc qui tourne encore sous une distribution Linux datée ; l'agent ESX, lui,
+dépend du DSDK\glsadd{dsdk} (\emph{Daemon SDK}), le \gls{sdk} propriétaire fourni par VMware
+(désormais Broadcom) pour développer les \emph{daemons} exécutés sur les
+hyperviseurs ESXi, qui impose sa propre chaîne de construction
+(section~\ref{chap:t6}). \textbf{Docker} complète l'outillage en encapsulant une
+chaîne de compilation complète dans une image reproductible ; il a notamment
+servi, chez Beemo, à rapatrier en local un \emph{build} jusque-là confiné à une
+machine distante.
 
-Le stockage des \gls{cdr} (les données générées par les équipements
-téléphoniques, selon le terme standard du domaine des télécoms) repose sur une base
-NoSQL, Cassandra. Cette dernière présentant toutefois certaines limitations,
-ClickHouse a été introduit en complément : il s'agit d'une base de données
-relationnelle orientée colonne, qui offre d'excellentes performances sur les
-requêtes d'agrégation et se prête donc particulièrement bien au calcul de
-statistiques sur de gros volumes de données.
-
-\section{Outils de build et de compilation}
-% TODO (auteur) : vérifier les outils exacts (make/CMake, versions de g++).
-Dans les deux entreprises, les logiciels C++ sont compilés sur un
-environnement Linux avec la \gls{toolchain} GNU (\texttt{g++}), pilotée par
-des \emph{makefiles}. Cette chaîne, en apparence banale, joue un rôle central
-dans deux des missions présentées : chez Free Mobile, la taille de la base de
-code rend la compilation parallèle si gourmande en ressources qu'elle devient
-elle-même un sujet d'ingénierie (section~\ref{chap:t2}) ; chez Beemo, la
-compilation de l'agent VSX dépend d'un \gls{sdk} propriétaire fourni par
-Broadcom, le DSDK, qui impose sa propre chaîne et ses propres réglages
-(section~\ref{chap:t6}).
-
-\textbf{Docker} complète cet outillage : il permet d'encapsuler une chaîne de
-compilation complète dans une image reproductible, et a servi chez Beemo à
-rapatrier en local un \emph{build} jusque-là confiné à une machine distante.
-
-\section{Gestion de version et intégration continue}
-% TODO (auteur) : préciser la forge utilisée chez Beemo et les pipelines CI
-% réellement en place dans chaque entreprise.
-Le versionnement du code repose sur \textbf{Git} dans les deux entreprises,
-avec une forge \textbf{GitLab} chez Free Mobile, où les modifications sont
-intégrées par \emph{merge requests} soumises à revue de code. Ce
-fonctionnement, aujourd'hui standard, prend ici un relief particulier : chez
-Free Mobile, une partie des sources du logiciel de valorisation n'était
+Le versionnement repose sur \textbf{Git}, avec une forge \textbf{GitLab} dans
+les deux entreprises, où les modifications sont intégrées par \emph{merge
+requests} soumises à revue et où les pipelines de \gls{ci} sont également
+hébergés. Ce fonctionnement, aujourd'hui standard, prend ici un relief
+particulier : une partie des sources du logiciel de valorisation n'était
 \emph{pas} versionnée à l'arrivée de l'équipe, et certains binaires en
-production ne correspondaient plus à aucune source identifiée. Il s'agit là
-d'un exemple typique de dette dont la résorption conditionne tout le reste.
+production ne correspondaient plus à aucune source identifiée, un cas typique
+de dette dont la résorption conditionne tout le reste. L'\gls{ci} prolonge la
+même logique : les suites de tests, dont le framework de la
+section~\ref{chap:t3}, ont vocation à s'exécuter automatiquement à chaque
+modification, pour détecter les régressions avant la mise en production plutôt
+qu'après.
 
-L'\gls{ci} s'inscrit dans la même logique : les suites de tests, dont le
-framework présenté à la section~\ref{chap:t3}, ont vocation à être exécutées
-automatiquement à chaque modification, de façon à détecter les régressions
-avant la mise en production plutôt qu'après.
+\section{Stockage et supervision}
+Le cœur télécom de Free Mobile s'appuie sur un éventail de briques de données :
+une base MySQL pour les usages historiques liés aux abonnés, Cassandra puis
+ClickHouse pour le stockage des \gls{cdr}, Apache Kafka pour le transport des
+flux vers les autres équipes. Ces briques relèvent toutefois du décor de mes
+missions plutôt que de leur matière. La seule qu'elles touchent directement est
+la supervision : assurée par \textbf{Grafana}, qui agrège dans des tableaux de
+bord les métriques remontées par le \emph{Valo Engine}, elle constitue le point
+de départ de ma première tâche (section~\ref{chap:t1}).
 
-\section{Méthodologie et gestion de projet}
-Chez Free Mobile, l'organisation du travail suit une méthode \emph{agile},
-structurée en \emph{sprints} et rythmée par des points quotidiens
-(\emph{daily meetings}). La durée des sprints était ajustée à la nature des
-logiciels maintenus par l'équipe : la partie cœur, écrite en C++, ainsi que
-les outils liés au traitement des \gls{cdr} étaient développés sur des sprints
-de trois semaines, tandis que la partie \gls{api} et interface web, dont les
-besoins différaient, suivait des cycles plus courts de deux semaines.
+\section{Organisation du travail}
+Les deux équipes travaillent en méthode \emph{agile}, structurée en
+\emph{sprints} de deux à trois semaines et rythmée par un point quotidien.
+Beemo en décline une forme plus complète, avec une phase de raffinement
+(\emph{refinement}) où les tickets sont précisés avant développement et une
+rétrospective en fin de sprint ; Free Mobile se montrait plus souple sur ces
+rituels. Au-delà de ces nuances, la méthode répondait également bien aux
+besoins des deux contextes.
 
-Le rituel central était le point quotidien d'une quinzaine de minutes, tenu en
-début de journée, autour de huit heures quarante-cinq selon les heures
-d'arrivée de chacun, avant le début effectif de la journée de travail. Ce
-rendez-vous court permettait à chaque membre de l'équipe de partager son
-avancement et d'identifier rapidement les éventuels points de blocage.
-
-Mon positionnement dans cette organisation était particulier : mes
-développements n'étaient pas intégrés aux sprints. Je travaillais en effet sur
-des outils annexes dont la production ne dépendait pas directement, même s'ils
-aidaient les développeurs à produire un code plus sûr et à gagner en confiance
-lors des \emph{releases}. Ce statut « hors sprint » m'a offert un réel confort
-de développement, en me dégageant de la pression liée aux échéances de
-livraison.
-
-Chez Beemo Technologie, l'organisation repose également sur une méthode
-\emph{agile}, mais déclinée de façon plus complète : on y retrouve l'ensemble
-des étapes du processus. Le point quotidien s'y tient à onze heures
-quarante-cinq, et s'y ajoute une phase de raffinement (\emph{refinement})
-au cours de laquelle les tickets sont précisés avant le démarrage de leur
-développement. Cette pratique n'était pas spécifiquement mise en œuvre chez
-Free Mobile, où l'on se montrait plus flexible sur ce point. Chaque fin de
-sprint, d'une durée de deux à trois semaines, donne par ailleurs lieu à une
-rétrospective.
-
-Au-delà de ces nuances, il n'existe pas de différence majeure entre les deux
-équipes : la méthode agile correspond bien aux besoins du développement dans
-les deux contextes. En revanche, mon rôle y était sensiblement différent de
-celui que j'occupais chez Free Mobile. Mes développements ayant vocation à
-être livrés en production, j'étais cette fois pleinement intégré aux sprints.
+La vraie différence tenait à mon positionnement. Chez Free Mobile, mes
+développements portaient sur des outils annexes dont la production ne dépendait
+pas directement : j'y travaillais « hors sprint », ce qui m'a offert un réel
+confort en me dégageant de la pression des échéances de livraison. Chez Beemo,
+mes développements ayant vocation à être livrés en production, j'étais cette
+fois pleinement intégré aux sprints.

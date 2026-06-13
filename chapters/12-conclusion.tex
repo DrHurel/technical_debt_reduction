@@ -31,9 +31,8 @@ suite Lua sur l'ensemble de son périmètre et constitue désormais le filet de
 non-régression du \emph{Valo Engine} ; l'extension VS~Code
 (section~\ref{chap:t4}) l'accompagne et en a ouvert l'usage à toute
 l'équipe ; le portage vers les forks legacy (section~\ref{chap:t5}) a
-couvert les six variantes visées (France B2C et B2B, Caraïbes, Italie B2C et
-B2B, proxy italien) et a été l'occasion d'une transmission de connaissances
-en binôme avant mon départ.
+couvert les sept réseaux visés (les six forks legacy et le réseau prépayé) et a
+été l'occasion d'une transmission de connaissances en binôme avant mon départ.
 
 Sur le volet du \textbf{code à visée de production dans un existant
 endetté} (chapitre~\ref{chap:production}), la fonctionnalité d'immuabilité
@@ -55,7 +54,7 @@ suivantes.
 J'en retiens aussi deux enseignements moins attendus. Le premier est que la
 forme de dette la plus dangereuse n'est pas dans le code : c'est la dette de
 connaissance, celle qui part avec les personnes, comme le framework de test
-après le départ de David ou la procédure de compilation de l'agent VSX que je
+après le départ de David ou la procédure de compilation de l'agent ESX que je
 suis venu reprendre. Sa parade est la capitalisation sous forme exécutable :
 tests, patchs versionnés, outillage. Le second est la dimension humaine du
 remboursement : un travail de fond sur du legacy est ingrat, et la motivation
@@ -95,7 +94,7 @@ désormais cette migration envisageable ; la résorption de la dette de
 compilation passera, elle, par l'adoption des modules C++20 lorsque les
 chaînes de compilation l'autoriseront. Chez Beemo, la suite est double :
 fiabiliser la validation des packages auprès de Broadcom, puis l'automatiser
-pour achever l'harmonisation de la chaîne de production de l'agent VSX, et
+pour achever l'harmonisation de la chaîne de production de l'agent ESX, et
 mener à son terme la fonctionnalité d'immuabilité. À plus long terme, la
 couche d'adaptation qui l'héberge ouvre une voie de modernisation progressive
 du firmware : écrire chaque évolution en C++ moderne et testable, et « gommer »

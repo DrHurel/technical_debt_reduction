@@ -42,6 +42,7 @@
 \usepackage{letterspace}        % \textls[...]{} : interlettrage
 \usepackage{ragged2e}
 \usepackage{tikz}               % cadre fin en filigrane sur la couverture
+\usetikzlibrary{positioning,fit,backgrounds,arrows.meta,calc}
 \usepackage{ebgaramond}         % serif académique — réservé à la couverture
 \renewcommand*\rmdefault{lmr}   % …le corps du mémoire reste en Latin Modern
                                 % (\ebgaramond bascule localement sur la garde)
@@ -78,6 +79,24 @@
   tabsize=2, captionpos=b,
   literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ù}{{\`u}}1 {ê}{{\^e}}1 {ç}{{\c c}}1 {â}{{\^a}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ü}{{\"u}}1 {É}{{\'E}}1 {È}{{\`E}}1 {À}{{\`A}}1 {œ}{{\oe}}1 {Œ}{{\OE}}1
 }
+% Définition minimale d'un langage YAML pour listings (commentaires, chaînes,
+% mots-clés structurants des scénarios de test).
+\lstdefinelanguage{yaml}{
+  morecomment=[l]{\#},
+  morestring=[b]",
+  keywords={customers,localizations,voice_nat_mo,voice_sms_mo,setup,voice_call,
+            send_sms,check,cdr,interval,variables,packages,location,customer},
+  sensitive=true,
+}
+
+% ---------- Listings : garder chaque exemple sur une seule page ------
+% Chaque exemple de code (lstlisting) et sa légende sont enrobés dans une
+% minipage insécable : LaTeX bascule le bloc entier sur la page suivante
+% plutôt que de le couper en deux. Les extraits du mémoire tiennent tous
+% sur une page, condition d'usage de ce procédé.
+\usepackage{etoolbox}
+\BeforeBeginEnvironment{lstlisting}{\par\medskip\noindent\begin{minipage}{\linewidth}}
+\AfterEndEnvironment{lstlisting}{\end{minipage}\par\medskip}
 
 % ---------- Glossaire / acronymes ------------------------------------
 \usepackage[acronym,toc,nonumberlist]{glossaries}
