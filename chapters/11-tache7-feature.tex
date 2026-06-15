@@ -8,8 +8,7 @@
 % son insertion dans la base de code existante (legacy ? bien outillée ?).
 Le métier de Beemo n'est pas de proposer un \textbf{service de cloud} à la
 manière des grands fournisseurs que sont Amazon, Google ou Microsoft. Il
-s'agit de fournir aux \textbf{professionnels}, c'est-à-dire aux hébergeurs et
-aux entreprises pour qui la donnée constitue un actif critique, un moyen de
+s'agit de fournir aux \textbf{professionnels}, c'est-à-dire aux entreprises pour qui la donnée constitue un actif critique, un moyen de
 \textbf{sécuriser leurs données} et de garantir leur \textbf{restauration} en cas d'incident, qu'il soit
 d'origine \textbf{physique} ou \textbf{malveillante}. Le produit central, la
 \textbf{Beebox}, est une appliance de \textbf{sauvegarde} qui peut être
@@ -46,9 +45,17 @@ aggraver la dette} d'un firmware qui en cumule la plupart des symptômes :
         de la box, rendant le code difficile à lire et à raisonner ;
   \item des \textbf{fonctions extrêmement longues} et une \textbf{maîtrise
         approximative du C++}, donnant lieu à des constructions trompeuses,
-        par exemple des contrôles du type \texttt{this == nullptr}, un cas qui
-        \textbf{ne peut jamais se produire} et trahit une incompréhension du
-        langage ;
+        par exemple des contrôles du type \texttt{this == nullptr} : non
+        seulement ce cas \textbf{ne peut jamais se produire} et trahit une
+        incompréhension du langage, mais il est plus pernicieux encore, car un
+        tel test relève de l'\textbf{\emph{undefined behavior}}, que le
+        compilateur est libre, selon son implémentation, de
+        \textbf{supprimer à l'optimisation} comme de traduire par un
+        \textbf{crash}\footnote{Ce risque n'a rien de théorique : à partir de
+        GCC~6 (2016), l'optimiseur suppose que le pointeur \texttt{this} est
+        toujours non nul et élimine purement et simplement les tests du type
+        \texttt{this == nullptr}, ce qui a cassé des bases de code aussi
+        établies que Qt~5, Chromium et KDevelop~\cite{gcc6porting}.} ;
   \item une \textbf{absence totale de tests} (ni \gls{test-regression}, ni
         tests unitaires), qui prive de tout filet de sécurité lors d'une
         modification ;

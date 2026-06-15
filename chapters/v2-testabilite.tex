@@ -1,4 +1,5 @@
 \chapter{Rendre testable un logiciel legacy : résorber les régressions et s'en prémunir}
+\chaptermark{Rendre testable un logiciel legacy}
 \label{chap:testabilite}
 % Chapitre-chapeau du volet 2 : framework (t3), extension VS Code (t4), portage (t5).
 
@@ -9,7 +10,14 @@ chapitre~\ref{chap:veille} : la \textbf{dette de test}, c'est-à-dire
 l'absence de filet de sécurité automatisé autour d'un logiciel pourtant
 critique pour la facturation : le \emph{Valo Engine} calcule le coût de
 chaque appel, et une régression ou une panne sur ce maillon peut engendrer
-des pertes \textbf{de l'ordre du million d'euros en une semaine}.
+des pertes \textbf{de l'ordre du million d'euros en une semaine}. À cette
+criticité s'ajoute une difficulté déjà entrevue au chapitre~\ref{chap:env} : le
+nombre de cas à éprouver est de nature \textbf{combinatoire}. La valorisation
+dépend d'une multitude de paramètres (type de communication, réseau, offre,
+options) dont les combinaisons se multiplient, si bien que tester correctement
+le moteur revient à parcourir un espace de scénarios trop vaste pour être
+couvert à la main. C'est cette double exigence, criticité et explosion du
+nombre de cas, qui rend un outillage de test automatisé indispensable.
 
 L'importance des tests dans un contexte legacy dépasse la seule détection
 d'anomalies. Sans filet de non-régression, chaque modification (correctif,

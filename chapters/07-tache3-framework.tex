@@ -113,8 +113,6 @@ customers:
 localizations:
   france:
     vlr: 33695029402
-  australia:
-    vlr: 61
 
 voice_nat_mo:
   - setup:
@@ -235,6 +233,15 @@ signale désormais une régression du moteur, et non un défaut du test. C'est t
 filet de sécurité qui s'en trouve restaurée : l'équipe peut faire confiance
 au verdict de la suite, condition première pour que les tests soient
 réellement consultés et maintenus.
+
+Sur le plan quantitatif, la suite a porté la \gls{couverture}\glsadd{couverture}
+du code du moteur jusqu'à \textbf{75~\%}, un niveau qui atteste d'un logiciel
+\textbf{fortement éprouvé}, couvrant un maximum de scénarios malgré leur nombre
+combinatoire. Les \textbf{25~\%} restants ne constituent pas pour autant un angle
+mort préoccupant : comme évoqué au chapitre~\ref{chap:env}, l'analyse de la
+manière dont le code legacy avait été produit a montré qu'ils relèvent pour
+l'essentiel de \textbf{code défensif}, c'est-à-dire de chemins parant des
+situations très peu probables en environnement de production.
 
 Au regard du fil rouge (chapitre~\ref{chap:veille}), cette mission actionne
 le levier central identifié par Feathers~\cite{feathers2004} : doter un code

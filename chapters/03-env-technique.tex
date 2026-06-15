@@ -22,7 +22,11 @@ d'abord à l'attrait du langage lui-même : il a beaucoup évolué et propose
 aujourd'hui une bibliothèque standard et des fonctionnalités permettant
 d'écrire un code conforme aux recommandations issues des dernières avancées du
 génie logiciel. Étant compilé, il offre en outre des performances élevées :
-chez Free Mobile, où un gros volume de données devait être traité, ce point
+chez Free Mobile, où un gros volume de données devait être
+traité\footnote{À titre d'ordre de grandeur, le réseau Free Mobile compte
+plus de 15~millions d'abonnés en France, répartis sur deux \emph{clusters}
+selon une proportion d'environ 70~/~30, pour un volume de données de l'ordre
+de la centaine de téraoctets par jour.}, ce point
 était impératif ; chez Beemo, où les \emph{box} ont vocation à sauvegarder
 plusieurs téraoctets de données, de bonnes performances restent nécessaires
 pour garantir une expérience utilisateur correcte.
@@ -70,6 +74,19 @@ section~\ref{chap:t3}, ont vocation à s'exécuter automatiquement à chaque
 modification, pour détecter les régressions avant la mise en production plutôt
 qu'après.
 
+À ces suites s'adjoint la mesure de la \gls{couverture}\glsadd{couverture}, qui
+indique quelles portions du code sont effectivement exercées par les tests. Son
+intérêt ne tient pas à un taux qu'il faudrait maximiser pour lui-même, mais à la
+lecture qu'elle autorise : en repérant les zones non couvertes, on distingue ce
+qui mérite réellement un test de ce qui peut s'en passer. Une portion non testée
+relevant du code défensif, qui pare une situation jugée improbable, ne pose pas
+le même problème qu'une branche fonctionnelle laissée sans contrôle. La donnée
+sert ainsi moins à juger l'existant qu'à orienter l'effort de test là où il
+manque vraiment. Ce point prend tout son sens chez Free Mobile, où le nombre de
+scénarios possibles croît de façon combinatoire : les tester tous est hors
+d'atteinte, et la couverture devient l'instrument qui permet de prioriser
+lesquels écrire.
+
 \section{Stockage et supervision}
 Le cœur télécom de Free Mobile s'appuie sur un éventail de briques de données :
 une base MySQL pour les usages historiques liés aux abonnés, Cassandra puis
@@ -93,5 +110,5 @@ La vraie différence tenait à mon positionnement. Chez Free Mobile, mes
 développements portaient sur des outils annexes dont la production ne dépendait
 pas directement : j'y travaillais « hors sprint », ce qui m'a offert un réel
 confort en me dégageant de la pression des échéances de livraison. Chez Beemo,
-mes développements ayant vocation à être livrés en production, j'étais cette
+mes développements étant destinés à la production, j'étais cette
 fois pleinement intégré aux sprints.

@@ -23,7 +23,13 @@ manuelle et fragile : on \textbf{poussait la base de code vers une machine
 distante}, sur laquelle elle était compilée avec le \textbf{DSDK}
 (\emph{Daemon SDK}), le \gls{sdk} fourni par VMware (désormais Broadcom) pour
 développer les \emph{daemons} (services d'arrière-plan) exécutés sur les
-hyperviseurs ESXi, avant de pouvoir être testée.
+hyperviseurs ESXi, avant de pouvoir être testée. À cette lourdeur s'ajoute une
+contrainte propre au \textbf{test} de l'agent : développer un agent ESX impose
+de le valider dans un \textbf{environnement sans Docker}. Étant un \emph{daemon}
+destiné à l'hyperviseur, l'agent ne peut être éprouvé en le conteneurisant comme
+on le ferait d'un logiciel ordinaire ; son test reste tributaire d'un
+hôte ESXi réel, ce qui prive d'un levier d'isolation et de reproductibilité
+pourtant courant ailleurs.
 
 La dette technique est apparue avec le \textbf{passage à la version~8 du DSDK},
 nécessaire pour supporter la version~8 de l'agent. Dans sa configuration de

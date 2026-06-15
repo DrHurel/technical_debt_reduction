@@ -18,7 +18,12 @@ La supervision de la valorisation s'appuie sur \textbf{Grafana}, qui agrège dan
 des \emph{dashboards} les métriques remontées par le \emph{Valo Engine}. Or cette
 supervision n'existe pas sur une seule instance : on en retrouve plusieurs,
 typiquement une par environnement (développement, recette, production) ou par
-réseau, qui doivent présenter les \textbf{mêmes tableaux de bord}. Faire vivre
+réseau\footnote{Les métriques sont en effet différenciées par réseau : on
+retrouve ainsi des instances pour l'Italie, la Réunion, les Caraïbes et la
+France, chacune déclinée le cas échéant en versions \emph{B2C} et \emph{B2B},
+soit de l'ordre de sept réseaux à maintenir. Chaque évolution devait donc être
+répliquée et tenue à jour sur l'ensemble, ce qui rendait l'opération d'autant
+plus fastidieuse.}, qui doivent présenter les \textbf{mêmes tableaux de bord}. Faire vivre
 ces instances en parallèle suppose donc de \textbf{répliquer} la configuration de
 l'une vers les autres à chaque évolution.
 

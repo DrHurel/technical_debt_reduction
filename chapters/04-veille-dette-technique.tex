@@ -1,4 +1,5 @@
 \chapter{Appropriation scientifique : la dette technique et ses enjeux business}
+\chaptermark{Appropriation scientifique : la dette technique}
 \label{chap:veille}
 
 % =====================================================================
@@ -100,8 +101,7 @@ les équipes \emph{reconnaissent}~\cite{pavlic2022}, et propose des modèles
 explicatifs de sa production dans les contextes Agile et DevOps~\cite{kanita2022}.
 Toute la difficulté consiste à
 résorber la dette \emph{sans} renoncer à cette capacité de livraison continue.
-C'est précisément cet équilibre que les deux entreprises ont eu à construire, de
-manière empirique, comme le détaille le retour d'expérience qui suit.
+C'est précisément cet équilibre que les deux entreprises ont eu à construire, comme le détaille le retour d'expérience qui suit.
 
 \section{Retour d'expérience : stratégies d'adressage et dimension sociale}
 % Section nourrie par l'observation directe des deux contextes (Free Mobile,
@@ -117,11 +117,8 @@ revient sur ce que j'ai pu observer dans chacun de ces contextes.
 Face à la tension décrite plus haut, les deux entreprises ont adopté une même
 réponse : un adressage incrémental de la dette. Plutôt que de geler les
 développements, il s'agit de partir du code existant et, lorsqu'une
-fonctionnalité doit être ajoutée à un endroit donné, de profiter de
-l'intervention pour réécrire le code concerné lorsque cela est possible. Chez
-Free Mobile, cette logique a résulté d'une évolution de la stratégie,
-privilégiant cette réécriture « au fil de l'eau » plutôt qu'une reprise de
-contrôle purement frontale.
+fonctionnalité doit être ajoutée, de profiter de
+l'intervention pour réécrire le code concerné lorsque cela est possible.
 
 \subsection{Des dettes de nature différente}
 Si la logique est commune, la dette ne s'exprimait pas de la même façon d'une
@@ -135,8 +132,7 @@ de quelques outils externes : on y recourait par exemple à des requêtes SQL l�
 où des mécanismes plus adaptés existaient.
 
 Chez Beemo, les contraintes de réécriture étaient bien plus fortes. Le code y
-est plus cloisonné et, paradoxalement, plus lisible, mais aussi beaucoup plus
-ancien : écrit à l'origine en C, puis en C++. Pour composer avec ces
+est moins cloisonné et bien moins lisible que chez Free Mobile. Pour composer avec ces
 contraintes, des \emph{patterns} ont été mis en place afin de cloisonner
 totalement le code \emph{legacy} du code moderne : les nouvelles fonctionnalités
 sont écrites dans une librairie embarquée puis injectée dans le code historique.
@@ -224,10 +220,9 @@ de tests et qui rend, plus largement, le développement de nouvelles
 fonctionnalités difficile. Chacune des tâches qui suivent peut ainsi se lire
 comme une réponse à une facette de ce constat.
 
-Les trois chapitres suivants présentent ces missions regroupées par nature,
-selon les leviers qu'elles actionnent : \textbf{outiller la productivité et
-standardiser l'environnement de développement}
-(chapitre~\ref{chap:outils}), \textbf{rendre testable un logiciel legacy}
-pour résorber les régressions et s'en prémunir
-(chapitre~\ref{chap:testabilite}), puis \textbf{développer du code à visée
-de production dans un existant endetté} (chapitre~\ref{chap:production}).
+Les trois chapitres suivants regroupent ces missions selon les leviers
+qu'elles actionnent : \textbf{outiller la productivité et standardiser
+l'environnement} (chapitre~\ref{chap:outils}), \textbf{rendre testable un
+logiciel legacy} (chapitre~\ref{chap:testabilite}), puis \textbf{développer du
+code à visée de production dans un existant endetté}
+(chapitre~\ref{chap:production}).

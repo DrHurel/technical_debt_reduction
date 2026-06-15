@@ -110,7 +110,8 @@ ensuite affichées directement dans l'\gls{ide}.
        {Adaptateur \textsc{dap}\\\scriptsize contrôle le flot\\d'exécution du test};
 
   % --- Étage 3 : moteur ---
-  \node[eng, below=22mm of $(lsps)!0.5!(daps)$] (engine)
+  \coordinate (fwmid) at ($(lsps)!0.5!(daps)$);
+  \node[eng, below=22mm of fwmid] (engine)
        {\textbf{Valo Engine}\\\scriptsize API privée + APIs publiques\\(service d'état des variables, par David)};
 
   % --- Conteneurs (arrière-plan) ---
