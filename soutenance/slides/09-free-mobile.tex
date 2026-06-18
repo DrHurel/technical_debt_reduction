@@ -1,0 +1,22 @@
+% =====================================================================
+%  Ce que j'ai observé chez Free Mobile
+% =====================================================================
+\begin{frame}{Ce que j'ai observé chez Free Mobile}
+  \vspace{0.7cm}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily,node distance=1.15cm]
+    \node[flowbox] (a) {\flowtxt{Reprendre le contrôle}{du \emph{Valo Engine}, un logiciel critique}};
+    \node[flowbox,right=of a] (b) {\flowtxt{De petits ajouts}{dans un existant ingrat, sans la satisfaction du neuf}};
+    \node[flowbox,right=of b] (c) {\flowtxt{Perte de motivation}{bien réelle, visible dans toute l'équipe}};
+    \node[flowhi,above right=0.4cm and 1.15cm of c] (d) {\flowtxthi{Perte de connaissance}{la démotivation mène aux départs}};
+    \node[flowhi,below right=0.4cm and 1.15cm of c] (e) {\flowtxthi{Livraisons à l'arrêt}{aucune nouvelle fonctionnalité pendant plusieurs mois}};
+    \draw[flowarr] (a) -- (b);
+    \draw[flowarr] (b) -- (c);
+    \draw[flowarr] (c.east) to[out=30,in=180] (d.west);
+    \draw[flowarr] (c.east) to[out=-30,in=180] (e.west);
+  \end{tikzpicture}}
+  \par\vspace{0.8cm}
+  {\fontsize{10}{13}\selectfont\textcolor{muted}%
+    {Le terreau de la dette sociale : un enchaînement, pas un accident isolé.}}
+\end{frame}

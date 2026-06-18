@@ -1,0 +1,20 @@
+% =====================================================================
+%  Le terrain : le framework de test
+% =====================================================================
+\begin{frame}{Le terrain : le framework de test du Valo Engine}
+  \vspace{0.7cm}
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily,node distance=1.3cm]
+    \node[flowbox] (y) {\flowtxt{Scénarios déclaratifs}{en YAML : on décrit \emph{quoi} vérifier, jamais \emph{comment}}};
+    \node[flowbox,right=of y] (p) {\flowtxt{Surcouche de Pytest}{\textbf{\textasciitilde 30 000} lignes de Python qui exécutent les scénarios}};
+    \node[flowhi,right=of p] (s) {\flowtxthi{Le filet de sécurité}{couvre le moteur de non-régression}};
+    \draw[flowarr] (y) -- (p);
+    \draw[flowarr] (p) -- (s);
+  \end{tikzpicture}}
+  \par\vspace{0.95cm}
+  \begin{columns}[c,onlytextwidth]
+    \column{0.5\textwidth}\centering\bignum{200+}{scénarios de test}
+    \column{0.5\textwidth}\centering\bignum{75 \%}{de couverture du moteur}
+  \end{columns}
+\end{frame}

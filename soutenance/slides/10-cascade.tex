@@ -1,0 +1,26 @@
+% =====================================================================
+%  Une cascade de départs
+% =====================================================================
+\newcommand{\castep}[2]{%
+  \noindent\raisebox{0.1ex}{\textcolor{accent}{\rule{1.5ex}{1.5ex}}}\hspace{0.4cm}%
+  \begin{minipage}[t]{\dimexpr\textwidth-1.2cm\relax}%
+    {\bfseries\fontsize{12}{15}\selectfont\color{ink}#1}\\[1pt]
+    {\fontsize{10}{13}\selectfont\color{ink2}#2}\end{minipage}\par}
+
+\begin{frame}{Une cascade de départs}
+  \vspace{0.25cm}
+  \castep{Un ultimatum de six mois}%
+    {Un développeur pose ses conditions, puis quitte l'équipe.}
+  \vspace{0.32cm}
+  \castep{Le départ de David}%
+    {Perte d'attrait pour l'environnement et changement de cap stratégique entraînant son départ.}
+  \vspace{0.32cm}
+  \castep{Un collègue change d'équipe}%
+    {Le sentiment d'avoir « jeté au placard » plus d'un an de développement.}
+  \vspace{0.32cm}
+  \castep{Mon propre départ}%
+    {Free Mobile en janvier, pour rejoindre Beemo en avril.}
+  \vspace{0.42cm}
+  {\fontsize{10}{13}\selectfont\textcolor{muted}%
+    {Chaque départ emporte une part de la connaissance du logiciel.}}
+\end{frame}

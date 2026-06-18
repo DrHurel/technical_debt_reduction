@@ -25,6 +25,11 @@
 *.glsdefs
 *.ist
 
+# Beamer (soutenance)
+*.nav
+*.snm
+*.vrb
+
 # latexmk
 *.fls
 *.fdb_latexmk

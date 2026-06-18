@@ -1,0 +1,32 @@
+% =====================================================================
+%  Deux engrenages : les deux spirales de la démotivation
+% =====================================================================
+\begin{frame}{Deux spirales, un même déclencheur}
+  \vspace{0.55cm}
+  \centering
+  \resizebox{0.96\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily,
+      node distance=0.9cm,
+      stp/.style={draw=accent,line width=1.3pt,fill=white,rounded corners=4pt,
+                  minimum height=1.3cm,text width=3.4cm,align=center,
+                  font=\bfseries\fontsize{11}{13}\selectfont,text=ink},
+      bad/.style={fill=accent,rounded corners=4pt,minimum height=1.3cm,
+                  text width=3.4cm,align=center,
+                  font=\bfseries\fontsize{11}{13}\selectfont,text=bg},
+      arr/.style={-{Stealth[length=4mm,width=4mm]},accent,line width=1.6pt}]
+    \node[stp] (mot) {Perte de motivation};
+    % spirale haute : départ -> perte de connaissance
+    \node[stp,above right=0.4cm and 2.1cm of mot] (dem) {Démission};
+    \node[bad,right=2.1cm of dem] (con) {Perte de connaissances};
+    % spirale basse : ralentissement -> perte financière
+    \node[stp,below right=0.4cm and 2.1cm of mot] (ral) {Ralentissement des livraisons};
+    \node[bad,right=2.1cm of ral] (fin) {Perte financière};
+    \draw[arr] (mot.east) to[out=30,in=180] (dem.west);
+    \draw[arr] (dem) -- (con);
+    \draw[arr] (mot.east) to[out=-30,in=180] (ral.west);
+    \draw[arr] (ral) -- (fin);
+  \end{tikzpicture}}
+  \par\vspace{0.5cm}
+  {\fontsize{10}{13}\selectfont\textcolor{muted}%
+    {Un même déclencheur, la démotivation, alimente deux pertes : la connaissance et l'argent.}}
+\end{frame}

@@ -1,0 +1,18 @@
+% =====================================================================
+%  Facteur 1 : la maîtrise de l'architecture
+% =====================================================================
+\begin{frame}{Facteur 1 : la maîtrise de l'architecture}
+  \vspace{0.7cm}
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily,node distance=1.3cm]
+    \node[flowbox] (a) {\flowtxt{Vision fine}{ayant conçu l'essentiel du framework}};
+    \node[flowbox,right=of a] (b) {\flowtxt{Prompts justes}{et des re-migrations rapides vers le résultat visé}};
+    \node[flowhi,right=of b] (c) {\flowtxthi{L'IA amplifie}{une compréhension déjà constituée}};
+    \draw[flowarr] (a) -- (b);
+    \draw[flowarr] (b) -- (c);
+  \end{tikzpicture}}
+  \par\vspace{0.95cm}
+  {\fontsize{10.5}{14}\selectfont\textcolor{muted}%
+    {L'IA amplifie la compréhension ; elle ne s'y substitue pas.}}
+\end{frame}

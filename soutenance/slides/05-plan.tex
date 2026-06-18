@@ -1,0 +1,34 @@
+% =====================================================================
+%  5 — PLAN DE LA SOUTENANCE : les trois axes
+% =====================================================================
+% Deux parties : (1) les enjeux sociaux et de productivité qui motivent la
+% réduction de la dette technique (dette technique, intérêt de l'IA, gains
+% de productivité) ; (2) le cœur du propos, écrire du code de production
+% dans une base déjà fortement endettée. Mise en page : gros numéros serif
+% en accent, titres serif encre, descriptif en gris, filet de séparation.
+\newcommand{\planitem}[3]{%
+  \noindent
+  \begin{minipage}[c]{1.85cm}%
+    {\seriffont\bfseries\fontsize{38}{38}\selectfont\color{accent}#1}%
+  \end{minipage}%
+  \begin{minipage}[c]{\dimexpr\textwidth-1.95cm\relax}%
+    {\seriffont\bfseries\fontsize{16}{20}\selectfont\color{ink}#2\par}%
+    \vspace{2pt}%
+    {\fontsize{10.5}{14}\selectfont\color{ink2}#3\par}%
+  \end{minipage}\par}
+
+\begin{frame}{Trois points qui me tiennent à cœur}
+  \vspace{0.30cm}
+  \planitem{01}{Les enjeux sociaux de la dette technique}%
+    {Motivation des équipes, dette de connaissance et coût humain du legacy}
+
+  \vspace{0.28cm}{\color{rule}\rule{\textwidth}{0.6pt}}\par\vspace{0.28cm}
+
+  \planitem{02}{L'IA, une solution pleine de promesses}%
+    {Un levier puissant mais conditionné, et ses propres risques de dette}
+
+  \vspace{0.28cm}{\color{rule}\rule{\textwidth}{0.6pt}}\par\vspace{0.28cm}
+
+  \planitem{03}{Écrire du code dans un existant fortement endetté}%
+    {L'adressage incrémental et l'isolation du code neuf sur une base legacy}
+\end{frame}

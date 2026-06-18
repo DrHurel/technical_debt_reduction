@@ -1,0 +1,28 @@
+% =====================================================================
+%  Un refactoring pour le portage, une transmission
+% =====================================================================
+\begin{frame}{Un refactoring pour le portage, une transmission}
+  \vspace{0.2cm}
+  \begin{columns}[c,onlytextwidth]
+    \column{0.50\textwidth}
+      \centering
+      \resizebox{\textwidth}{!}{%
+      \begin{tikzpicture}[font=\sffamily]
+        \node[flowhi,text width=3.2cm,minimum height=1.6cm] (core)
+          {\flowtxthi{\emph{core}}{le socle commun}};
+        \foreach \i/\lab [count=\n from 0] in
+          {1/{fork 1},2/{fork 2},3/{fork 3},4/{fork 4},5/{fork 5},6/{fork 6},7/{prépayé}}{
+          \node[draw=accent,line width=1pt,fill=white,rounded corners=4pt,
+                minimum width=2.6cm,minimum height=0.78cm,font=\bfseries\fontsize{11}{13}\selectfont,
+                text=ink] (s\i) at (6.4,4.2-1.05*\n) {\emph{spec} · \lab};
+          \draw[flowarr,line width=1.2pt] (core.east) to[out=0,in=180] (s\i.west);
+        }
+      \end{tikzpicture}}
+    \column{0.46\textwidth}
+      \card{2.3cm}{Une refonte \emph{core} / \emph{spec}}{Un socle commun, puis une
+        \emph{spec} par fork qui n'isole que les différences métier.}
+      \vspace{0.28cm}
+      \cardhi{2.3cm}{Une transmission assumée}{Mené en \textbf{binôme}, pour
+        transmettre la connaissance du framework avant mon départ.}
+  \end{columns}
+\end{frame}

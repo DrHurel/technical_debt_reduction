@@ -1,0 +1,62 @@
+% =====================================================================
+%  2 — FRISE CHRONOLOGIQUE DU PARCOURS
+% =====================================================================
+% Récit : arrivée chez Free Mobile (équipe Valo) → restructuration de
+% l'équipe (incertitude, déclencheur du départ) → arrivée chez Beemo
+% Technologie dans le sillage de David Desmarest → aujourd'hui.
+% Code couleur : segment Free en rouge, segment Beemo en bleu, présent
+% en corail (accent UM). Le dessin est mis à l'échelle de la largeur de
+% texte (resizebox), comme le Gantt du mémoire.
+\begin{frame}{Deux ans, deux entreprises}
+  \vspace{0.45cm}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily]
+    % ----- ligne de temps : Free (rouge) jusqu'à l'arrivée Beemo, puis bleu -----
+    \draw[freeRed,line width=3.2pt]   (1.0,0) -- (15.0,0);
+    \draw[beemoBlue,line width=3.2pt] (15.0,0) -- (19.0,0);
+    \draw[beemoBlue,line width=3.2pt,-{Stealth[length=4.5mm,width=4.5mm]}]
+          (19.0,0) -- (20.1,0);
+
+    % ----- marqueurs (halo ivoire pour détacher de la ligne) -----
+    \foreach \x/\c in {1.5/freeRed, 6.0/freeRed, 10.5/freeRed, 15.0/beemoBlue, 19.0/accent}{
+      \fill[bg]  (\x,0) circle (0.34);
+      \fill[\c]  (\x,0) circle (0.21);
+    }
+
+    % ----- jalon 1 (haut) -----
+    \draw[freeRed,line width=1pt] (1.5,0.34) -- (1.5,0.62);
+    \node[anchor=south,align=center,text width=3.8cm] at (1.5,0.62){%
+      {\bfseries\color{freeRed}\fontsize{11}{13}\selectfont Juillet 2024}\\[1.5pt]
+      {\seriffont\bfseries\color{ink}\fontsize{13}{15}\selectfont Arrivée chez Free Mobile}\\[2pt]
+      {\color{muted}\fontsize{9.5}{12}\selectfont Équipe Valo — Core SI}};
+
+    % ----- jalon 2 (bas) ----- restructuration ~2-3 mois avant le départ de David (oct. 2025)
+    \draw[freeRed,line width=1pt] (6.0,-0.34) -- (6.0,-0.62);
+    \node[anchor=north,align=center,text width=3.8cm] at (6.0,-0.62){%
+      {\bfseries\color{freeRed}\fontsize{11}{13}\selectfont Été 2025}\\[1.5pt]
+      {\seriffont\bfseries\color{ink}\fontsize{13}{15}\selectfont Restructuration de l'équipe}\\[2pt]
+      {\color{muted}\fontsize{9.5}{12}\selectfont Incertitude sur la conduite du développement à venir}};
+
+    % ----- jalon 3 (haut) ----- démission posée en janv. 2026, préavis 2 mois
+    \draw[freeRed,line width=1pt] (10.5,0.34) -- (10.5,0.62);
+    \node[anchor=south,align=center,text width=3.8cm] at (10.5,0.62){%
+      {\bfseries\color{freeRed}\fontsize{11}{13}\selectfont Janvier 2026}\\[1.5pt]
+      {\seriffont\bfseries\color{ink}\fontsize{13}{15}\selectfont Démission de Free Mobile}\\[2pt]
+      {\color{muted}\fontsize{9.5}{12}\selectfont Préavis de deux mois}};
+
+    % ----- jalon 4 (bas) -----
+    \draw[beemoBlue,line width=1pt] (15.0,-0.34) -- (15.0,-0.62);
+    \node[anchor=north,align=center,text width=3.8cm] at (15.0,-0.62){%
+      {\bfseries\color{beemoBlue}\fontsize{11}{13}\selectfont Avril 2026}\\[1.5pt]
+      {\seriffont\bfseries\color{ink}\fontsize{13}{15}\selectfont Arrivée chez Beemo Technologie}\\[2pt]
+      {\color{muted}\fontsize{9.5}{12}\selectfont Dans le sillage de David Desmarest}};
+
+    % ----- jalon 5 (haut) -----
+    \draw[accent,line width=1pt] (19.0,0.34) -- (19.0,0.62);
+    \node[anchor=south,align=center,text width=3.4cm] at (19.0,0.62){%
+      {\bfseries\color{accent}\fontsize{11}{13}\selectfont Aujourd'hui}\\[1.5pt]
+      {\seriffont\bfseries\color{ink}\fontsize{13}{15}\selectfont Missions en cours}\\[2pt]
+      {\color{muted}\fontsize{9.5}{12}\selectfont Juin 2026}};
+  \end{tikzpicture}}
+\end{frame}

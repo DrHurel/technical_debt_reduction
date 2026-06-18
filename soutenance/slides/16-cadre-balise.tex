@@ -1,0 +1,19 @@
+% =====================================================================
+%  Sur un cadre balisé : un gain considérable
+% =====================================================================
+\begin{frame}{Sur un cadre balisé : un gain considérable}
+  \vspace{0.7cm}
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily,node distance=1.3cm]
+    \node[flowbox] (a) {\flowtxt{Cadre déjà balisé}{décrire un nouveau fork avec des instructions \emph{standards}}};
+    \node[flowbox,right=of a] (b) {\flowtxt{Le modèle se guide}{atteindre le résultat attendu devient simple}};
+    \node[flowhi,right=of b] (c) {\flowtxthi{Gain considérable}{de productivité sur ce périmètre}};
+    \draw[flowarr] (a) -- (b);
+    \draw[flowarr] (b) -- (c);
+  \end{tikzpicture}}
+  \par\vspace{0.95cm}
+  {\fontsize{10.5}{14}\selectfont\textcolor{muted}%
+    {Un constat qui rejoint fidèlement les conclusions d'une \textbf{étude d'IBM}
+     sur l'impact des LLM dans la production de code.}}
+\end{frame}

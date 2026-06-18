@@ -1,0 +1,334 @@
+% =====================================================================
+%  TEMPLATE BEAMER — SOUTENANCE DE MÉMOIRE  (UM · Free Mobile · Beemo)
+%  Design : ivoire sobre + accent corail (Université de Montpellier),
+%           serif (titres) / sans (corps), bandeau partenaires sur cartouches blancs.
+%  Moteur : XeLaTeX ou LuaLaTeX  (compiler avec --shell-escape PAS requis)
+%  Compilation :  xelatex soutenance.tex   (x2 pour les refs/remember picture)
+%             ou  latexmk -xelatex soutenance.tex
+%
+%  Polices (chargées par NOM DE FICHIER .otf : présentes dans TeX Live,
+%  aucune installation système requise) :
+%    - Source Serif 4   (titres)   — paquet TeX Live « sourceserif »
+%    - Source Sans 3    (corps)    — paquet TeX Live « sourcesans »
+%    - JetBrains Mono   (code)     — paquet TeX Live « jetbrainsmono-otf »
+%  Pour utiliser des polices installées sur le système, remplacez le bloc
+%  « POLICES » par \setsansfont{Source Sans 3} / \setmonofont{JetBrains Mono},
+%  etc. En dernier recours, Latin Modern Roman / Latin Modern Sans (toujours
+%  disponibles) font l'affaire.
+%
+%  LOGOS : fichiers dans  assets/logo-um.png , assets/logo-free.png ,
+%  assets/logo-beemo.png  (les fonds blancs Free/Beemo se fondent dans les
+%  cartouches blancs \logochip). Ajustez les hauteurs au besoin.
+% =====================================================================
+
+\documentclass[aspectratio=169,11pt,t]{beamer}
+
+% ---------- Dimensions du canevas ------------------------------------
+% Le design est conçu sur un grand canevas 16:9. On agrandit la page
+% (en conservant le ratio) : tailles de police et graphismes absolus se
+% « dézooment » alors proportionnellement, le tout respire et rien n'est
+% coupé. Les projecteurs/visionneuses ajustent à l'écran (seul le ratio
+% compte). Pour revenir au format compact, supprimer cette ligne.
+\geometry{paperwidth=240mm,paperheight=135mm}
+
+% ---------- Polices (fontspec : nécessite XeLaTeX/LuaLaTeX) ----------
+% Chargement par nom de fichier .otf : kpathsea/luaotfload trouve les
+% fichiers dans l'arborescence TeX Live sans passer par fontconfig.
+\usepackage{fontspec}
+\setsansfont{SourceSans3}[
+  Extension   = .otf,
+  UprightFont = *-Regular,
+  BoldFont    = *-Semibold,
+  ItalicFont  = *-RegularIt,
+  BoldItalicFont = *-SemiboldIt ]
+\newfontfamily\seriffont{SourceSerif4}[
+  Extension   = .otf,
+  UprightFont = *-Regular,
+  BoldFont    = *-Semibold,
+  ItalicFont  = *-RegularIt,
+  BoldItalicFont = *-SemiboldIt ]
+\setmonofont{JetBrainsMono}[
+  Extension   = .otf,
+  UprightFont = *-Regular,
+  BoldFont    = *-SemiBold,
+  ItalicFont  = *-Italic,
+  BoldItalicFont = *-SemiBoldItalic,
+  Scale       = 0.86 ]
+\renewcommand{\familydefault}{\sfdefault}   % corps en sans par défaut
+
+% ---------- Langue ----------
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+
+% ---------- Paquets graphiques ----------
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{listings}
+\usepackage{graphicx}
+
+% --- Logo partenaire sur cartouche blanc à hauteur FIXE (logos harmonisés) ---
+% \logochip{fichier}{hauteur-logo}{hauteur-cartouche} : logo centré verticalement.
+% La hauteur de cartouche est commune à une rangée ; la hauteur de logo est
+% ajustée par image pour égaliser le poids optique (sceau carré = un peu plus petit).
+\newcommand{\logochip}[3]{%
+  \colorbox{white}{%
+    \raisebox{-0.5\height}{\rule{0pt}{#3}}\kern2pt%
+    \raisebox{-0.5\height}{\includegraphics[height=#2]{assets/#1}}\kern2pt}}
+
+% --- Cartouche logo BORDÉ (comme les cartouches blancs de la page de titre HTML :
+%     fond blanc, fin liseré ivoire). Mêmes arguments que \logochip. ---
+\newcommand{\logocard}[3]{%
+  \fcolorbox{chiprule}{white}{%
+    \raisebox{-0.5\height}{\rule{0pt}{#3}}\kern2pt%
+    \raisebox{-0.5\height}{\includegraphics[height=#2]{assets/#1}}\kern2pt}}
+
+% =====================================================================
+%  PALETTE
+% =====================================================================
+\definecolor{accent}{HTML}{D8524A}   % corail Université de Montpellier
+\definecolor{accentlt}{HTML}{F7CFC9} % corail clair (sur fond foncé)
+\definecolor{freeRed}{HTML}{E2001A}  % rouge Free Mobile
+\definecolor{beemoBlue}{HTML}{1B8ED4}% bleu Beemo
+\definecolor{dark}{HTML}{1B1A17}     % fond sombre des séparateurs de section
+\definecolor{bg}{HTML}{F6F4EF}       % ivoire (fond des slides)
+\definecolor{panel}{HTML}{ECEAE3}    % panneau teinté
+\definecolor{ink}{HTML}{1C1B18}      % presque noir
+\definecolor{ink2}{HTML}{3A382F}     % gris foncé (corps secondaire)
+\definecolor{stone}{HTML}{56524A}    % gris chaud (sous-titre, légendes, citation)
+\definecolor{muted}{HTML}{7A766C}    % gris légende / pied de page
+\definecolor{rule}{HTML}{DDD8CF}     % filets fins
+\definecolor{chiprule}{HTML}{E4DFD6} % bordure des cartouches logos (page de titre)
+\definecolor{codebg}{HTML}{24302F}   % fond bloc de code
+\definecolor{codehead}{HTML}{1C2625} % barre de titre du bloc de code (chrome)
+\definecolor{codefg}{HTML}{DFE7E3}   % texte code
+\definecolor{codekw}{HTML}{7FA8B5}   % mots-clés
+\definecolor{codefn}{HTML}{E7C97F}   % fonctions
+\definecolor{codenum}{HTML}{C69A6B}  % nombres
+\definecolor{codecmt}{HTML}{6F7E7A}  % commentaires
+\definecolor{codedim}{HTML}{8A948F}  % nom de fichier (chrome)
+\definecolor{dotred}{HTML}{E06C5A}   % pastille « feu » rouge
+\definecolor{dotyellow}{HTML}{E0B54A}% pastille « feu » jaune
+\definecolor{dotgreen}{HTML}{5AA86F} % pastille « feu » verte
+
+% =====================================================================
+%  THÈME — réglages globaux
+% =====================================================================
+\setbeamercolor{background canvas}{bg=bg}
+\setbeamercolor{normal text}{fg=ink}
+\setbeamercolor{itemize item}{fg=accent}
+\setbeamercolor{itemize subitem}{fg=accent}
+\usebeamercolor[fg]{normal text}
+
+\setbeamertemplate{navigation symbols}{}      % pas de barre de navigation
+\setbeamersize{text margin left=1.1cm,text margin right=1.1cm}
+
+% ----- Puces carrées accent -----
+\setbeamertemplate{itemize item}{\raisebox{0.18ex}{\textcolor{accent}{\rule{1.6ex}{1.6ex}}}}
+\setbeamertemplate{itemize subitem}{\textcolor{accent}{\textbf{--}}}
+
+% ----- Titre de frame : serif, accent, filet dessous -----
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.55cm}%
+  {\seriffont\bfseries\color{accent}\fontsize{20}{24}\selectfont\insertframetitle\par}%
+  \vspace*{0.18cm}%
+  {\color{accent}\rule{1.55cm}{2.2pt}}\par
+  \vspace*{0.30cm}%
+}
+
+% ----- Pied de page : nom | logos partenaires | carré accent + n° -----
+\setbeamertemplate{footline}{%
+  % filet de séparation (cf. border-top du rendu HTML)
+  \hbox to\paperwidth{\hskip1.1cm{\color{rule}\rule{\dimexpr\paperwidth-2.2cm\relax}{0.4pt}}\hskip1.1cm}%
+  \vskip2.5pt%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=3.0ex,dp=2.2ex,leftskip=1.1cm,rightskip=1.1cm]{}%
+      \usebeamerfont{normal text}\fontsize{7}{9}\selectfont\color{muted}%
+      \insertshortauthor\ — \insertshorttitle\hfill
+      {\setlength{\fboxsep}{1.5pt}%
+       \logochip{logo-um.png}{0.30cm}{0.34cm}\hspace{3pt}%
+       \logochip{logo-free.png}{0.27cm}{0.34cm}\hspace{3pt}%
+       \logochip{logo-beemo.png}{0.21cm}{0.34cm}}\hspace{10pt}%
+      \textcolor{accent}{\rule{0.9ex}{0.9ex}}\ \insertframenumber%
+    \end{beamercolorbox}}%
+  \vskip2pt%
+}
+
+% =====================================================================
+%  COMMANDES UTILITAIRES
+% =====================================================================
+% --- Diapositive de séparation de section (fond sombre + graphisme tri-marques) -
+% Usage : \sectionslide{01}{Titre de section}{Phrase de transition.}
+% Composition : cercles aux couleurs UM / Free / Beemo (mode « screen »),
+% barre tricolore, légende de rappel des couleurs en bas de page.
+\newcommand{\sectionslide}[3]{%
+\begingroup
+\setbeamercolor{background canvas}{bg=dark}
+\begin{frame}[plain,t]
+  % --- composition graphique (nécessite 2 compilations pour remember picture) ---
+  \begin{tikzpicture}[remember picture,overlay]
+    \coordinate (cl) at ($(current page.north east)+(-2.55,-3.75)$);
+    % anneaux décoratifs (rappel d'orbite / mouvement)
+    \draw[bg!16!dark,line width=1pt,dash pattern=on 3pt off 5pt] (cl) circle (3.05);
+    \draw[bg!10!dark,line width=0.6pt] (cl) circle (2.15);
+    % cercles des 3 marques (mode « screen »)
+    \begin{scope}[blend mode=screen]
+      \fill[accent]    ($(cl)+(-0.5,1.05)$)  circle (2.35);
+      \fill[freeRed]   ($(cl)+(1.1,-0.15)$)  circle (2.35);
+      \fill[beemoBlue] ($(cl)+(-0.5,-0.85)$) circle (2.35);
+    \end{scope}
+    % satellites sur les orbites
+    \fill[accent]    ($(cl)+(62:3.05)$)  circle (0.15);
+    \fill[beemoBlue] ($(cl)+(232:2.15)$) circle (0.11);
+  \end{tikzpicture}
+  % --- contenu ---
+  \vspace*{2.0cm}
+  {\seriffont\bfseries\fontsize{84}{84}\selectfont\textcolor{bg!18!dark}{#1}\par}
+  \vspace*{0.20cm}
+  \hbox{\textcolor{accent}{\rule{0.7cm}{2.6pt}}\textcolor{freeRed}{\rule{0.7cm}{2.6pt}}%
+    \textcolor{beemoBlue}{\rule{0.7cm}{2.6pt}}\hspace{0.32cm}%
+    \raisebox{0.06cm}{\bfseries\fontsize{11}{11}\selectfont\textcolor{bg!70!dark}{\MakeUppercase{Partie}~#1}}}\par
+  \vspace*{0.30cm}
+  {\seriffont\bfseries\fontsize{30}{34}\selectfont\textcolor{bg}{#2}\par}
+  \vspace*{0.24cm}
+  {\fontsize{12}{16}\selectfont\textcolor{bg!60!dark}{#3}\par}
+  \vfill
+  % --- rappel des couleurs des entreprises ---
+  \hbox{%
+    \raisebox{0.12ex}{\textcolor{accent}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{bg!72!dark}{Université de Montpellier}}\hspace{0.7cm}%
+    \raisebox{0.12ex}{\textcolor{freeRed}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{bg!72!dark}{Free Mobile}}\hspace{0.7cm}%
+    \raisebox{0.12ex}{\textcolor{beemoBlue}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{bg!72!dark}{Beemo Technologie}}}
+  \vspace*{0.7cm}
+\end{frame}
+\endgroup}
+
+% --- « Gros chiffre » clé --------------------------------------------
+\newcommand{\bignum}[2]{%
+  {\seriffont\bfseries\fontsize{46}{46}\selectfont\textcolor{accent}{#1}}\\[2pt]
+  {\fontsize{11}{14}\selectfont\textcolor{stone}{#2}}}
+
+% =====================================================================
+%  COMPOSANTS GRAPHIQUES — cartes & flux (pour « dégraisser » le texte)
+% =====================================================================
+% --- Carte : marqueur accent + titre serif + corps, fond blanc bordé,
+%     hauteur fixe pour égaliser les rangées. \card{hauteur}{titre}{corps} ---
+\newcommand{\card}[3]{%
+  \setlength{\fboxsep}{11pt}%
+  \fcolorbox{rule}{white}{%
+    \begin{minipage}[t][#1][t]{\dimexpr\linewidth-24pt\relax}
+      {\seriffont\bfseries\fontsize{13}{16}\selectfont\color{ink}%
+        \raisebox{0.18ex}{\textcolor{accent}{\rule{1.2ex}{1.2ex}}}\ #2\par}
+      \vspace{4.5pt}
+      {\fontsize{10}{13.5}\selectfont\color{ink2}#3\par}
+    \end{minipage}}}
+
+% --- Carte « sombre » (accent plein) pour un point fort / une chute ---
+\newcommand{\cardhi}[3]{%
+  \setlength{\fboxsep}{11pt}%
+  \colorbox{accent}{%
+    \begin{minipage}[t][#1][t]{\dimexpr\linewidth-24pt\relax}
+      {\seriffont\bfseries\fontsize{13}{16}\selectfont\color{bg}%
+        \raisebox{0.18ex}{\textcolor{bg}{\rule{1.2ex}{1.2ex}}}\ #2\par}
+      \vspace{4.5pt}
+      {\fontsize{10}{13.5}\selectfont\color{bg!92}#3\par}
+    \end{minipage}}}
+
+% --- Styles TikZ pour diagrammes de flux ----------------------------
+\tikzset{
+  flowbox/.style={draw=accent,line width=1.2pt,fill=white,rounded corners=6pt,
+                  minimum height=1.9cm,text width=4.0cm,align=center,
+                  font=\sffamily,inner sep=8pt},
+  flowhi/.style={fill=accent,rounded corners=6pt,
+                 minimum height=1.9cm,text width=4.0cm,align=center,
+                 font=\sffamily,text=bg,inner sep=8pt},
+  flowarr/.style={-{Stealth[length=4mm,width=4mm]},accent,line width=1.8pt},
+}
+% Contenu d'un nœud de flux : titre gras + détail gris.
+\newcommand{\flowtxt}[2]{{\bfseries\fontsize{12}{14}\selectfont #1}\\[2pt]{\fontsize{9}{11.5}\selectfont\color{ink2}#2}}
+\newcommand{\flowtxthi}[2]{{\bfseries\fontsize{12}{14}\selectfont #1}\\[2pt]{\fontsize{9}{11.5}\selectfont\color{bg!88}#2}}
+
+% --- Style des blocs de code (listings) ------------------------------
+\lstdefinestyle{soutenance}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\fontsize{10}{13}\selectfont\color{codefg},
+  keywordstyle=\color{codekw}\bfseries,
+  emphstyle=\color{codefn},
+  commentstyle=\color{codecmt}\itshape,
+  numberstyle=\tiny\color{codecmt},
+  stringstyle=\color{accentlt},
+  showstringspaces=false,
+  breaklines=true,
+  tabsize=4,
+  xleftmargin=16pt,xrightmargin=0pt,
+  framexleftmargin=16pt,framexrightmargin=0pt,
+  aboveskip=0pt,belowskip=0pt,
+  frame=none,
+  language=Python,
+  emph={descente_gradient,gradient,range}
+}
+
+% --- Barre de titre « fenêtre » du bloc de code (3 pastilles + nom de fichier),
+%     reprenant le chrome du rendu HTML. À placer JUSTE au-dessus du lstlisting
+%     (suivie de \par\nointerlineskip) ; sa largeur épouse celle de la colonne,
+%     comme le fond du listing (xleftmargin/framexleftmargin = 16pt, droite à 0). ---
+\newcommand{\codetitlebar}[1]{%
+  {\setlength{\fboxsep}{0pt}%
+   \colorbox{codehead}{\makebox[\linewidth][l]{%
+     \rule[-0.95ex]{0pt}{3.0ex}%
+     \hspace{14pt}%
+     \tikz{\fill[dotred]    (0,0) circle (2.2pt);}\hspace{4.5pt}%
+     \tikz{\fill[dotyellow] (0,0) circle (2.2pt);}\hspace{4.5pt}%
+     \tikz{\fill[dotgreen]  (0,0) circle (2.2pt);}\hspace{13pt}%
+     {\ttfamily\fontsize{8.5}{10}\selectfont\color{codedim}#1}\hfill}}}}
+
+% =====================================================================
+%  MÉTADONNÉES  — adaptées au mémoire (à ajuster si besoin)
+% =====================================================================
+\title{Réduction de la dette technique dans un environnement de production}
+\author{Jérémy Hurel}
+\institute{Université de Montpellier · Faculté des Sciences}
+\date{2026}
+
+% versions courtes pour le pied de page
+\newcommand{\shortname}{Jérémy Hurel}
+\newcommand{\shortwork}{Soutenance de mémoire}
+
+\begin{document}
+
+% =====================================================================
+%  DIAPOSITIVES — une diapo par fichier dans slides/
+% =====================================================================
+\input{slides/01-titre}
+\input{slides/02-frise}
+\input{slides/03-citation}
+\input{slides/04-emprunt}
+\input{slides/05-plan}
+\input{slides/06-section-01}
+\input{slides/07-dette-code}
+\input{slides/08-spirales}
+\input{slides/09-free-mobile}
+\input{slides/10-cascade}
+\input{slides/11-lecons}
+\input{slides/12-section-02}
+\input{slides/13-changement-cap}
+\input{slides/14-framework}
+\input{slides/15-refactoring}
+\input{slides/16-cadre-balise}
+\input{slides/17-facteur-1}
+\input{slides/18-facteur-2}
+\input{slides/19-bottleneck}
+\input{slides/20-cout}
+\input{slides/21-ia-levier}
+\input{slides/22-section-03}
+\input{slides/23-incremental}
+\input{slides/24-beemo}
+\input{slides/25-symptomes}
+\input{slides/26-pimpl}
+\input{slides/27-automatiser}
+\input{slides/28-immuabilite}
+\input{slides/29-conclusion}
+\input{slides/30-alternance}
+\input{slides/31-remerciements}
+
+\end{document}

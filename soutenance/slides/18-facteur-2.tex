@@ -1,0 +1,18 @@
+% =====================================================================
+%  Facteur 2, a contrario : sans la connaissance
+% =====================================================================
+\begin{frame}{Facteur 2, \emph{a contrario} : sans la connaissance}
+  \vspace{0.7cm}
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[font=\sffamily,node distance=1.3cm]
+    \node[flowbox] (a) {\flowtxt{Manque de connaissance}{du code métier et de l'architecture}};
+    \node[flowbox,right=of a] (b) {\flowtxt{Propositions injugeables}{impossible d'arbitrer ce que produit le modèle}};
+    \node[flowhi,right=of b] (c) {\flowtxthi{Résultat jeté}{une solution plus complexe, du temps perdu}};
+    \draw[flowarr] (a) -- (b);
+    \draw[flowarr] (b) -- (c);
+  \end{tikzpicture}}
+  \par\vspace{0.95cm}
+  {\fontsize{10.5}{14}\selectfont\textcolor{muted}%
+    {Cas vécu : le décodage des CDR, mené en mon absence avec une autre solution agentique.}}
+\end{frame}

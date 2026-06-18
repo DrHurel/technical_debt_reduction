@@ -1,0 +1,23 @@
+% =====================================================================
+%  Les symptômes, un par un
+% =====================================================================
+\begin{frame}{Les symptômes, un par un}
+  \begin{columns}[c,onlytextwidth]
+    \column{0.46\textwidth}
+      \begin{itemize}\setlength\itemsep{0.34cm}
+        \item Un \textbf{abus de directives de préprocesseur}
+              (\texttt{\#ifdef}) pour gérer les cas de compilation.
+        \item Des \textbf{fonctions interminables} et une maîtrise
+              approximative du C++ (jusqu'à des tests
+              \texttt{this == nullptr}, un \emph{undefined behavior}).
+        \item Une \textbf{absence totale de tests} : aucun filet de sécurité.
+        \item Un \texttt{main.h} qui \textbf{inclut tout le projet} : un
+              couplage massif.
+      \end{itemize}
+    \column{0.50\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{assets/dedup-light.png}\\[2pt]
+      {\fontsize{8}{10}\selectfont\textcolor{muted}%
+        {Un extrait du firmware historique.}}
+  \end{columns}
+\end{frame}
