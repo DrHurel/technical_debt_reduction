@@ -29,6 +29,11 @@
 *.nav
 *.snm
 *.vrb
+*.xdv
+
+# Outils de vérification visuelle (rendu PNG des diapos)
+soutenance/.venv-render/
+soutenance/render/
 
 # latexmk
 *.fls

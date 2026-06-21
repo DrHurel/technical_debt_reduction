@@ -93,6 +93,7 @@
 \definecolor{beemoBlue}{HTML}{1B8ED4}% bleu Beemo
 \definecolor{dark}{HTML}{1B1A17}     % fond sombre des séparateurs de section
 \definecolor{bg}{HTML}{F6F4EF}       % ivoire (fond des slides)
+\definecolor{sectionbg}{HTML}{ECE3D6}% sable chaud (fond des transitions de section)
 \definecolor{panel}{HTML}{ECEAE3}    % panneau teinté
 \definecolor{ink}{HTML}{1C1B18}      % presque noir
 \definecolor{ink2}{HTML}{3A382F}     % gris foncé (corps secondaire)
@@ -164,19 +165,19 @@
 % barre tricolore, légende de rappel des couleurs en bas de page.
 \newcommand{\sectionslide}[3]{%
 \begingroup
-\setbeamercolor{background canvas}{bg=dark}
+\setbeamercolor{background canvas}{bg=sectionbg}
 \begin{frame}[plain,t]
   % --- composition graphique (nécessite 2 compilations pour remember picture) ---
   \begin{tikzpicture}[remember picture,overlay]
     \coordinate (cl) at ($(current page.north east)+(-2.55,-3.75)$);
     % anneaux décoratifs (rappel d'orbite / mouvement)
-    \draw[bg!16!dark,line width=1pt,dash pattern=on 3pt off 5pt] (cl) circle (3.05);
-    \draw[bg!10!dark,line width=0.6pt] (cl) circle (2.15);
-    % cercles des 3 marques (mode « screen »)
-    \begin{scope}[blend mode=screen]
-      \fill[accent]    ($(cl)+(-0.5,1.05)$)  circle (2.35);
-      \fill[freeRed]   ($(cl)+(1.1,-0.15)$)  circle (2.35);
-      \fill[beemoBlue] ($(cl)+(-0.5,-0.85)$) circle (2.35);
+    \draw[ink!16!sectionbg,line width=1pt,dash pattern=on 3pt off 5pt] (cl) circle (3.05);
+    \draw[ink!10!sectionbg,line width=0.6pt] (cl) circle (2.15);
+    % cercles des 3 marques (mode « multiply » pour un fond clair)
+    \begin{scope}[blend mode=multiply]
+      \fill[accent,opacity=0.55]    ($(cl)+(-0.5,1.05)$)  circle (2.35);
+      \fill[freeRed,opacity=0.55]   ($(cl)+(1.1,-0.15)$)  circle (2.35);
+      \fill[beemoBlue,opacity=0.55] ($(cl)+(-0.5,-0.85)$) circle (2.35);
     \end{scope}
     % satellites sur les orbites
     \fill[accent]    ($(cl)+(62:3.05)$)  circle (0.15);
@@ -184,21 +185,21 @@
   \end{tikzpicture}
   % --- contenu ---
   \vspace*{2.0cm}
-  {\seriffont\bfseries\fontsize{84}{84}\selectfont\textcolor{bg!18!dark}{#1}\par}
+  {\seriffont\bfseries\fontsize{84}{84}\selectfont\textcolor{accent!24!sectionbg}{#1}\par}
   \vspace*{0.20cm}
   \hbox{\textcolor{accent}{\rule{0.7cm}{2.6pt}}\textcolor{freeRed}{\rule{0.7cm}{2.6pt}}%
     \textcolor{beemoBlue}{\rule{0.7cm}{2.6pt}}\hspace{0.32cm}%
-    \raisebox{0.06cm}{\bfseries\fontsize{11}{11}\selectfont\textcolor{bg!70!dark}{\MakeUppercase{Partie}~#1}}}\par
+    \raisebox{0.06cm}{\bfseries\fontsize{11}{11}\selectfont\textcolor{stone}{\MakeUppercase{Partie}~#1}}}\par
   \vspace*{0.30cm}
-  {\seriffont\bfseries\fontsize{30}{34}\selectfont\textcolor{bg}{#2}\par}
+  {\seriffont\bfseries\fontsize{30}{34}\selectfont\textcolor{ink}{#2}\par}
   \vspace*{0.24cm}
-  {\fontsize{12}{16}\selectfont\textcolor{bg!60!dark}{#3}\par}
+  {\fontsize{12}{16}\selectfont\textcolor{stone}{#3}\par}
   \vfill
   % --- rappel des couleurs des entreprises ---
   \hbox{%
-    \raisebox{0.12ex}{\textcolor{accent}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{bg!72!dark}{Université de Montpellier}}\hspace{0.7cm}%
-    \raisebox{0.12ex}{\textcolor{freeRed}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{bg!72!dark}{Free Mobile}}\hspace{0.7cm}%
-    \raisebox{0.12ex}{\textcolor{beemoBlue}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{bg!72!dark}{Beemo Technologie}}}
+    \raisebox{0.12ex}{\textcolor{accent}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{stone}{Université de Montpellier}}\hspace{0.7cm}%
+    \raisebox{0.12ex}{\textcolor{freeRed}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{stone}{Free Mobile}}\hspace{0.7cm}%
+    \raisebox{0.12ex}{\textcolor{beemoBlue}{\rule{1.4ex}{1.4ex}}}\ {\fontsize{9}{11}\selectfont\textcolor{stone}{Beemo Technologie}}}
   \vspace*{0.7cm}
 \end{frame}
 \endgroup}

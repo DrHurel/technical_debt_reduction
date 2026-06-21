@@ -2,6 +2,15 @@
 %  Les symptômes, un par un
 % =====================================================================
 \begin{frame}{Les symptômes, un par un}
+  % --- moitié gauche de la capture, zoomée, sur la moitié droite de l'écran ---
+  \begin{tikzpicture}[remember picture,overlay]
+    % on découpe l'affichage sur la seule moitié droite de la diapositive
+    \clip (current page.north) rectangle (current page.south east);
+    % image affichée à 2x : ancrée par sa gauche au centre, sa moitié gauche
+    % remplit alors la moitié droite de l'écran (le reste est rogné par le clip)
+    \node[anchor=west,inner sep=0pt] at (current page.center)
+      {\includegraphics[width=\paperwidth]{assets/dedup-light.png}};
+  \end{tikzpicture}
   \begin{columns}[c,onlytextwidth]
     \column{0.46\textwidth}
       \begin{itemize}\setlength\itemsep{0.34cm}
@@ -14,10 +23,6 @@
         \item Un \texttt{main.h} qui \textbf{inclut tout le projet} : un
               couplage massif.
       \end{itemize}
-    \column{0.50\textwidth}
-      \centering
-      \includegraphics[width=\textwidth]{assets/dedup-light.png}\\[2pt]
-      {\fontsize{8}{10}\selectfont\textcolor{muted}%
-        {Un extrait du firmware historique.}}
+    \column{0.50\textwidth}\mbox{}
   \end{columns}
 \end{frame}
